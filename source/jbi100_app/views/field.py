@@ -9,13 +9,14 @@ import plotly.graph_objects as go
 class Field(html.Div):
     def __init__(self, name):
         self.html_id = name.lower().replace(" ", "-")
+        self.field = self.build_background_fig()
         # Equivalent to `html.Div([...])`
         super().__init__(
             className="field",
             children=[
                 html.Div(
                     id="field",
-                    children=dcc.Graph(figure=self.build_background_fig()))]
+                    children=dcc.Graph(figure=self.field))]
                 )
 
     def build_background_fig(self):
@@ -35,3 +36,7 @@ class Field(html.Div):
                         hovertemplate=None,
                         hoverinfo="skip")
         return fig
+    
+    def update_field_players(self, team):
+        if team:
+            self.field.update_xaxes
