@@ -2,58 +2,74 @@ from dash import dcc, html
 from ..config import *
 from .scatterplot import *
 from dash.dependencies import Input, Output
+from .radar import *
 
 
-scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
+
 
 """
 Sub menu class of the left handside of the web page
 """
-def generate_description_card():
-    """
 
-    :return: A Div containing dashboard title & descriptions.
-    """
-    return html.Div(
-        id="description-card",
-        children=[
-            html.H5("Example dashboard"),
-            html.Div(
-                id="intro",
-                children="Select a team.",
-            ),
-        ],
-    )
 
-def generate_control_card():
-    """
+class Menu():
+    def __init__(self, plots):
+        self.plots = plots
+        pass
 
-    :return: A div with a drop down for the teams
-    """
-    return html.Div(
-        id="control-card",
-        children=[
-            html.Label("Select a team"),
-            dcc.Dropdown(
-                id="select-team",
-                options=[{"label": i, "value": i} for i in teams_list],
-                value=teams_list[0],
-            )
-        ], style={"textAlign": "float-left"}
-    )
+    def generate_description_card(self):
+        """
 
-def generate_scatter():
-    """
+        :return: A Div containing dashboard title & descriptions.
+        """
+        return html.Div(
+            id="description-card",
+            children=[
+                html.H5("Example dashboard"),
+                html.Div(
+                    id="intro",
+                    children="Select a team.",
+                ),
+            ],
+        )
 
-    :return: A div with a scatter plot
-    """
+    def generate_control_card(self):
+        """
 
-    return scatter_plot
+        :return: A div with a drop down for the teams
+        """
+        return html.Div(
+            id="control-card",
+            children=[
+                html.Label("Select a team"),
+                dcc.Dropdown(
+                    id="select-team",
+                    options=[{"label": i, "value": i} for i in teams_list],
+                    value=teams_list[0],
+                )
+            ], style={"textAlign": "float-left"}
+        )
 
-    
+    def generate_scatter(self):
+        """
 
-def make_menu_layout():
-    """
-    Defines the elements that the submenu has and are returned to the main menu
-    """
-    return [generate_description_card(), generate_control_card(), generate_scatter()]
+        :return: A div with a scatter plot
+        """
+        for plot in self.plots:
+            if plot.__class__.__name__ == 'Scatterplot':
+                return plot
+
+    def generate_radar(self):
+        """
+
+        :return: A div with a scatter plot
+        """
+        for plot in self.plots:
+            if plot.__class__.__name__ == 'radar':
+                return plot
+
+    def make_menu_layout(self):
+        """
+        Defines the elements that the submenu has and are returned to the main menu
+        """
+        return [self.generate_description_card(), self.generate_control_card(), self.generate_scatter(), self.generate_radar()]

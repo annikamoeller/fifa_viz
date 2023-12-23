@@ -13,7 +13,12 @@ if __name__ == '__main__':
     This is the main layout of the webpage, its children are then sub divided
     into further html layouts 
     """
+    scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
+    radar_plot = radar("radar", "Messi", "Ronaldo", player_stats)
     
+    left_menu_plots = [scatter_plot, radar_plot]
+    left_menu = Menu(left_menu_plots)
+
     app.layout = html.Div(
         id="app-container",
         children=[
@@ -21,7 +26,7 @@ if __name__ == '__main__':
             html.Div(
                 id="left-column",
                 className="one-half column",
-                children=make_menu_layout()
+                children=left_menu.make_menu_layout()
             ),
 
             # Right column
@@ -55,6 +60,27 @@ if __name__ == '__main__':
         Input("select-team", "value")
     )
     def selected_team(team):
-        return Scatterplot.update(team)
+        return scatter_plot.update(team)
+    
+    @app.callback(
+    Output(radar_plot.html_id, 'figure'),
+    Input(scatter_plot.html_id, 'clickData'),
+    Input(scatter_plot.html_id, 'hoverData')
+    )
+    def selected_player(click, hover):
+        newPlayerClicked = False
 
-    app.run_server(debug=True, dev_tools_ui=False)
+        if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
+        else: clickedPlayer = None
+
+        if clickedPlayer != scatter_plot.get_click_player():
+                previouslyClickedPlayer = scatter_plot.get_click_player()
+                scatter_plot.set_click_player(clickedPlayer) 
+                newPlayerClicked = True
+
+        if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
+        else: hoveredPlayer = None
+        
+        return radar_plot.update(clickedPlayer, hoveredPlayer)
+
+    app.run_server(debug=True, dev_tools_ui=True)
