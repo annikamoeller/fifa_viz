@@ -37,9 +37,6 @@ class radar(html.Div):
         showlegend=False
         )
 
-        # fig.show()
-        
-        print("hi")
         # Equivalent to `html.Div([...])`
         super().__init__(
             className="radar",

@@ -19,10 +19,9 @@ class Menu():
 
     def generate_description_card(self):
         """
-
         :return: A Div containing dashboard title & descriptions.
         """
-        return html.Div(
+        return [html.Div(
             id="description-card",
             children=[
                 html.H5("Example dashboard"),
@@ -31,14 +30,13 @@ class Menu():
                     children="Select a team.",
                 ),
             ],
-        )
+        )]
 
-    def generate_control_card(self):
+    def generate_dropdown(self):
         """
-
         :return: A div with a drop down for the teams
         """
-        return html.Div(
+        return [html.Div(
             id="control-card",
             children=[
                 html.Label("Select a team"),
@@ -48,28 +46,24 @@ class Menu():
                     value=teams_list[0],
                 )
             ], style={"textAlign": "float-left"}
-        )
+        )]
 
-    def generate_scatter(self):
+    def generate_plots(self):
         """
-
         :return: A div with a scatter plot
         """
+        plots = []
         for plot in self.plots:
-            if plot.__class__.__name__ == 'Scatterplot':
-                return plot
-
-    def generate_radar(self):
-        """
-
-        :return: A div with a scatter plot
-        """
-        for plot in self.plots:
-            if plot.__class__.__name__ == 'radar':
-                return plot
+            plots.append(plot)
+        return plots
 
     def make_menu_layout(self):
         """
         Defines the elements that the submenu has and are returned to the main menu
         """
-        return [self.generate_description_card(), self.generate_control_card(), self.generate_scatter(), self.generate_radar()]
+        elements = []
+        elements += self.generate_description_card()
+        elements += self.generate_dropdown()
+        elements += self.generate_plots()
+  
+        return elements

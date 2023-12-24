@@ -20,10 +20,10 @@ class Scatterplot(html.Div):
     
     def update(self, x_axis_values=None):
         df = player_stats
-        
+
         if x_axis_values is not None:
             df = df[df['team'] == x_axis_values]
-        fig = px.scatter(df, x='birth_year', y='average_shot_distance', color='team', hover_data='player')
+        fig = px.scatter(df, x=self.feature_x, y=self.feature_y, color='team', hover_data='player')
 
         return fig
 

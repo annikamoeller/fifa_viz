@@ -15,7 +15,7 @@ if __name__ == '__main__':
     """
     scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
     radar_plot = radar("radar", "Messi", "Ronaldo", player_stats)
-    
+
     left_menu_plots = [scatter_plot, radar_plot]
     left_menu = Menu(left_menu_plots)
 
@@ -65,14 +65,15 @@ if __name__ == '__main__':
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'clickData'),
-    Input(scatter_plot.html_id, 'hoverData')
+    Input(scatter_plot.html_id, 'hoverData'),
     )
     def selected_player(click, hover):
         newPlayerClicked = False
-
+        
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
         else: clickedPlayer = None
 
+        #May be needed in the future
         if clickedPlayer != scatter_plot.get_click_player():
                 previouslyClickedPlayer = scatter_plot.get_click_player()
                 scatter_plot.set_click_player(clickedPlayer) 
