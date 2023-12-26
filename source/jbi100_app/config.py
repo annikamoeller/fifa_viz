@@ -15,12 +15,12 @@ df_player_gca           = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA Wor
 df_player_keepers       = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_keepers.csv', delimiter=',')
 df_player_keepersadv    = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_keepersadv.csv', delimiter=',')
 df_player_misc          = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_misc.csv', delimiter=',')
-df_player_passing       = pd.read_csv('../../fifa_viz/FIFA DatasetData/FIFA World Cup 2022 Player Data/player_passing.csv', delimiter=',')
-df_player_passing_types = pd.read_csv('../../fifa_viz/FIFA DatasetData/FIFA World Cup 2022 Player Data/player_passing_types.csv', delimiter=',')
-df_player_playingtime   = pd.read_csv('../../fifa_viz/FIFA DatasetData/FIFA World Cup 2022 Player Data/player_playingtime.csv', delimiter=',')
-df_player_possession    = pd.read_csv('../../fifa_viz/FIFA DatasetData/FIFA World Cup 2022 Player Data/player_possession.csv', delimiter=',')
-df_player_shooting      = pd.read_csv('../../fifa_viz/FIFA DatasetData/FIFA World Cup 2022 Player Data/player_shooting.csv', delimiter=',')
-df_player_stats         = pd.read_csv('../../fifa_viz/FIFA DatasetData/FIFA World Cup 2022 Player Data/player_stats.csv', delimiter=',')
+df_player_passing       = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_passing.csv', delimiter=',')
+df_player_passing_types = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_passing_types.csv', delimiter=',')
+df_player_playingtime   = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_playingtime.csv', delimiter=',')
+df_player_possession    = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_possession.csv', delimiter=',')
+df_player_shooting      = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_shooting.csv', delimiter=',')
+df_player_stats         = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_stats.csv', delimiter=',')
 
 # Create new stats per 90s for defense df 
 df_player_defense['blocked_shots_per_90s'] = df_player_defense['blocked_shots'] / df_player_defense['minutes_90s']
