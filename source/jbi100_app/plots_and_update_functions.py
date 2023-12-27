@@ -9,3 +9,5 @@ def build_background_fig():
     ar = field_width / field_height
     fig = px.imshow(field_image)
     return fig
+
+# Testing commit/push
