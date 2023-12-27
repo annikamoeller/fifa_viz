@@ -19,7 +19,7 @@ if __name__ == '__main__':
     teams_for_dropdown = [team for team in teams_list]
 
     scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
-    radar_plot = Radar("radar", "Messi", "Ronaldo", player_stats)
+    radar_plot = Radar("radar", player_stats)
 
     teams_dropdown = Dropdown("teams_dropdown", teams_for_dropdown, teams_for_dropdown[0], 'Team')
     positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
@@ -27,21 +27,22 @@ if __name__ == '__main__':
     left_menu_plots = [teams_dropdown, scatter_plot]
     right_menu_plots = [positions_dropdown, radar_plot]
 
+    #Create left and right side of the page
     app.layout = html.Div(
         id="app-container",
         children=[
             # Left column
             html.Div(
                 id="left-column",
-                className="one-half column",
-                children=left_menu_plots
+                className="one-half column",#base.css style
+                children=left_menu_plots #plots
             ),
 
             # Right column
             html.Div(
                 id="right-column",
-                className="one-half column",
-                children=right_menu_plots
+                className="one-half column", #base.css style
+                children=right_menu_plots #plots
             ),
         ],
     )
@@ -69,7 +70,11 @@ if __name__ == '__main__':
         Input(teams_dropdown.html_id, "value")
     )
     def selected_team(team):
+        """
+        Return a figure with a teams plot based on team dropdown value 
+        """
         return scatter_plot.update(team)
+    
     
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
@@ -78,12 +83,16 @@ if __name__ == '__main__':
     Input(positions_dropdown.html_id, 'value'),
     )
     def selected_player(click, hover, selected_stat):
+        """
+        Get clicked, hovered player and stats dropdown value 
+        return a radar figure with the stats of the selected players and dropdown
+        """
         newPlayerClicked = False
         
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
         else: clickedPlayer = None
 
-        #May be needed in the future
+        #Keeping track of the clicked and previously clicked player. May be needed in the future
         if clickedPlayer != scatter_plot.get_click_player():
                 previouslyClickedPlayer = scatter_plot.get_click_player()
                 scatter_plot.set_click_player(clickedPlayer) 

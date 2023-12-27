@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output
 
 """
 Sub menu class of the left handside of the web page
+Probably not necessary. Can just be done in app.py
 """
 
 

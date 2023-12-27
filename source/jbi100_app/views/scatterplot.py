@@ -5,6 +5,12 @@ import plotly.express as px
 
 class Scatterplot(html.Div):
     def __init__(self, name, feature_x, feature_y, df):
+        """
+        @name (str): used for the html_id
+        @feature_x (str): x-axis value that matches df column
+        @feature_y (str): y-axis value that matches df column
+        @df (df): main dataframe to be used
+        """
         self.html_id = name.lower().replace(" ", "-")
         self.df = df
         self.feature_x = feature_x
@@ -19,13 +25,21 @@ class Scatterplot(html.Div):
             style={'margin': 'auto', 'width': '70%', 'padding': 20}
         )
     
-    def update(self, x_axis_values=None):
+    def update(self, team=None):
+        """
+        @team (str): the team for the scatter plot
+        @returns ->>> figure class with new plot
+        """
         df = player_stats
 
-        if x_axis_values is not None:
-            df = df[df['team'] == x_axis_values]
+        #Get team from dataframe
+        if team is not None:
+            df = df[df['team'] == team]
+
+        #Plot scatter
         fig = px.scatter(df, x=self.feature_x, y=self.feature_y, color='team', hover_data='player')
 
+        #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
             modebar_color = '#136d6d',
@@ -46,8 +60,10 @@ class Scatterplot(html.Div):
         
         return fig
 
+    #Not needed or used for now
     def get_click_player(self):
         return self.clickPlayer
     
+    #Not needed or used for now
     def set_click_player(self, clickedPlayer):
         self.clickPlayer = clickedPlayer
