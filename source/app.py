@@ -5,6 +5,7 @@ from jbi100_app.config import *
 from jbi100_app.views.dropdown import *
 from jbi100_app.views.radar import *
 from jbi100_app.views.scatterplot import *
+from jbi100_app.views.multival_dropdown import *
 from dash import html
 import plotly.express as px
 from dash.dependencies import Input, Output
@@ -17,14 +18,16 @@ if __name__ == '__main__':
     into further html layouts 
     """
     teams_for_dropdown = [team for team in teams_list]
+    example_attributes = ['expected_goals', 'red_cards', 'tackles', 'penalty_goals']
 
     scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
     radar_plot = Radar("radar", "Messi", "Ronaldo", player_stats)
 
     teams_dropdown = Dropdown("teams_dropdown", teams_for_dropdown, teams_for_dropdown[0], 'Team')
     positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
+    attribute_dropdown = MultiValDropdown("attribute_dropdown", example_attributes, None, 'Attributes')
 
-    left_menu_plots = [teams_dropdown, scatter_plot]
+    left_menu_plots = [teams_dropdown, scatter_plot, attribute_dropdown]
     right_menu_plots = [positions_dropdown, radar_plot]
 
     app.layout = html.Div(
