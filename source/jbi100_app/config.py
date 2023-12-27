@@ -30,18 +30,22 @@ df_player_defense['tackles_won_percentage'] = df_player_defense['tackles_won'] /
 
 # defense df
 defense_radar_df = df_player_defense[['player', 'blocked_shots_per_90s','blocked_passes_per_90s', 'blocked_interceptions_per_90s', 'tackles_won_percentage', 'dribble_tackles_pct']]
+defense_radar_df = defense_radar_df.set_index('player')
 
 # striker df
 striker_radar_df = df_player_shooting[['player', 'shots_on_target_pct', 'goals_per_shot', 'average_shot_distance', 'xg', 'shots_per90']]
+striker_radar_df = striker_radar_df.set_index('player')
 
 # goalkeeper df
 goalkeeping_radar_df = pd.merge(df_player_keepers[['player', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_goal_kick_length_avg', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
+goalkeeping_radar_df = goalkeeping_radar_df.set_index('player')
 
 # create new stats for midfielder df 
 df_player_misc['aerials_won_pct'] = df_player_misc['aerials_won'] / (df_player_misc['aerials_lost'] + df_player_misc['aerials_won'])
 # midfielder df
 midfielder_radar_df = pd.merge(df_player_passing[['player','xg_assist', 'passes_pct', 'pass_xa']], df_player_gca[['player','gca']],  on='player', how='inner')
 midfielder_radar_df = pd.merge(midfielder_radar_df, df_player_misc[['player','aerials_won_pct']], on = 'player', how='inner')
+midfielder_radar_df = midfielder_radar_df.set_index('player')
 
 # total player df for non-keeper players (all stats used in radar plots combined into one df)
 total_player_df = pd.merge(midfielder_radar_df, striker_radar_df, on='player', how='inner')

@@ -16,6 +16,7 @@ class Scatterplot(html.Div):
             className="graph_card",
             children=
                 dcc.Graph(id=self.html_id),
+            style={'margin': 'auto', 'width': '70%', 'padding': 20}
         )
     
     def update(self, x_axis_values=None):
@@ -25,6 +26,24 @@ class Scatterplot(html.Div):
             df = df[df['team'] == x_axis_values]
         fig = px.scatter(df, x=self.feature_x, y=self.feature_y, color='team', hover_data='player')
 
+        fig.update_layout(plot_bgcolor='#26232C',
+            paper_bgcolor='#26232C',
+            modebar_color = '#136d6d',
+            title_font_color='white',
+            legend_font_color='white',
+            legend_title_font_color='white',
+            xaxis = dict(
+            color="#9D9D9D",
+            tickfont_size=14,
+            title_font=dict(size=20, color='#9D9D9D')),
+            yaxis=dict(
+                color="#9D9D9D",
+                titlefont_size=16,
+                tickfont_size=14,
+                gridcolor='#9D9D9D',
+                title_font=dict(size=17, color='#9D9D9D'),
+            ))
+        
         return fig
 
     def get_click_player(self):

@@ -2,6 +2,9 @@ from jbi100_app.main import app
 from jbi100_app.views.menu import *
 from jbi100_app.views.field import *
 from jbi100_app.config import *
+from jbi100_app.views.dropdown import *
+from jbi100_app.views.radar import *
+from jbi100_app.views.scatterplot import *
 from dash import html
 import plotly.express as px
 from dash.dependencies import Input, Output
@@ -13,11 +16,16 @@ if __name__ == '__main__':
     This is the main layout of the webpage, its children are then sub divided
     into further html layouts 
     """
-    scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
-    radar_plot = radar("radar", "Messi", "Ronaldo", player_stats)
+    teams_for_dropdown = [team for team in teams_list]
 
-    left_menu_plots = [scatter_plot, radar_plot]
-    left_menu = Menu(left_menu_plots)
+    scatter_plot = Scatterplot("shot_distance", 'birth_year', 'average_shot_distance', player_stats)
+    radar_plot = Radar("radar", "Messi", "Ronaldo", player_stats)
+
+    teams_dropdown = Dropdown("teams_dropdown", teams_for_dropdown, teams_for_dropdown[0], 'Team')
+    positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
+
+    left_menu_plots = [teams_dropdown, scatter_plot]
+    right_menu_plots = [positions_dropdown, radar_plot]
 
     app.layout = html.Div(
         id="app-container",
@@ -26,13 +34,14 @@ if __name__ == '__main__':
             html.Div(
                 id="left-column",
                 className="one-half column",
-                children=left_menu.make_menu_layout()
+                children=left_menu_plots
             ),
 
             # Right column
             html.Div(
                 id="right-column",
                 className="one-half column",
+                children=right_menu_plots
             ),
         ],
     )
@@ -57,7 +66,7 @@ if __name__ == '__main__':
     """
     @app.callback(
         Output(scatter_plot.html_id, 'figure'),
-        Input("select-team", "value")
+        Input(teams_dropdown.html_id, "value")
     )
     def selected_team(team):
         return scatter_plot.update(team)
@@ -66,8 +75,9 @@ if __name__ == '__main__':
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'clickData'),
     Input(scatter_plot.html_id, 'hoverData'),
+    Input(positions_dropdown.html_id, 'value'),
     )
-    def selected_player(click, hover):
+    def selected_player(click, hover, selected_stat):
         newPlayerClicked = False
         
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
@@ -82,6 +92,6 @@ if __name__ == '__main__':
         if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
         else: hoveredPlayer = None
         
-        return radar_plot.update(clickedPlayer, hoveredPlayer)
+        return radar_plot.update(clickedPlayer, hoveredPlayer, selected_stat)
 
     app.run_server(debug=True, dev_tools_ui=True)
