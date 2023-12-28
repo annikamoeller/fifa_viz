@@ -37,7 +37,7 @@ striker_radar_df = df_player_shooting[['player', 'shots_on_target_pct', 'goals_p
 striker_radar_df = striker_radar_df.set_index('player')
 
 # goalkeeper df
-goalkeeping_radar_df = pd.merge(df_player_keepers[['player', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_goal_kick_length_avg', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
+goalkeeping_radar_df = pd.merge(df_player_keepers[['player', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
 goalkeeping_radar_df = goalkeeping_radar_df.set_index('player')
 
 # create new stats for midfielder df 
@@ -47,7 +47,14 @@ midfielder_radar_df = pd.merge(df_player_passing[['player','xg_assist', 'passes_
 midfielder_radar_df = pd.merge(midfielder_radar_df, df_player_misc[['player','aerials_won_pct']], on = 'player', how='inner')
 midfielder_radar_df = midfielder_radar_df.set_index('player')
 
+position_df = df_player_misc[['player', 'position']]
+position_df_no_gk = position_df[position_df['position']!='GK']
+
 # total player df for non-keeper players (all stats used in radar plots combined into one df)
 total_player_df = pd.merge(midfielder_radar_df, striker_radar_df, on='player', how='inner')
 total_player_df = pd.merge(total_player_df, defense_radar_df, on='player', how='inner')
+total_player_df_no_gk = pd.merge(total_player_df, position_df_no_gk, on='player', how='inner')
+total_player_df_no_gk = total_player_df_no_gk.set_index('player')
 
+# total_player_df_no_gk_dropdown = list(total_player_df_no_gk.columns).remove('player')
+# gk_dropdown = list(goalkeeping_radar_df.columns).remove('player')

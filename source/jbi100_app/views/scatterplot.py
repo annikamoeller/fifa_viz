@@ -4,7 +4,7 @@ from ..config import *
 import plotly.express as px
 
 class Scatterplot(html.Div):
-    def __init__(self, name, feature_x, feature_y, df):
+    def __init__(self, name, df):
         """
         @name (str): used for the html_id
         @feature_x (str): x-axis value that matches df column
@@ -13,8 +13,8 @@ class Scatterplot(html.Div):
         """
         self.html_id = name.lower().replace(" ", "-")
         self.df = df
-        self.feature_x = feature_x
-        self.feature_y = feature_y
+        # self.feature_x = feature_x
+        # self.feature_y = feature_y
         self.clickPlayer = None
 
         # Equivalent to `html.Div([...])`
@@ -25,19 +25,15 @@ class Scatterplot(html.Div):
             style={'margin': 'auto', 'width': '70%', 'padding': 20}
         )
     
-    def update(self, team=None):
+    def update(self, on, x_axis_label=None, y_axis_label=None):
         """
         @team (str): the team for the scatter plot
         @returns ->>> figure class with new plot
         """
-        df = player_stats
-
-        #Get team from dataframe
-        if team is not None:
-            df = df[df['team'] == team]
-
-        #Plot scatter
-        fig = px.scatter(df, x=self.feature_x, y=self.feature_y, color='team', hover_data='player')
+        if on: df = goalkeeping_radar_df.reset_index()
+        else: df = total_player_df_no_gk.reset_index()
+        print(x_axis_label, y_axis_label)
+        fig = px.scatter(df, x=x_axis_label, y=y_axis_label, hover_data='player')
 
         #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',

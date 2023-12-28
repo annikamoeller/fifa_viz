@@ -1,8 +1,9 @@
 from dash import dcc, html
+from jbi100_app.config import *
 
 class Dropdown(html.Div):
  
-    def __init__(self, name, dropDownValues, startingValue, label=None, df=None):
+    def __init__(self, name, dropDownValues, startingValue, label=None, df=None, multiple_values=False):
         """
         Create a dropdown
         @name (str): name of the plot, used for html_id
@@ -23,6 +24,12 @@ class Dropdown(html.Div):
                     id=self.html_id,
                     options=dropDownValues,
                     value=startingValue,
+                    multi=multiple_values
                 )
             ], style={'margin': 'auto', 'width': '17%', 'color': 'black'} #Style of the dropdown
         )
+
+    def update(self, on):
+        if on: return list(goalkeeping_radar_df.columns), list(goalkeeping_radar_df.columns)[0]
+        else: return list(total_player_df_no_gk.columns), list(total_player_df_no_gk.columns)[0]
+        
