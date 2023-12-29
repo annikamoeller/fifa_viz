@@ -151,9 +151,12 @@ if __name__ == '__main__':
         Input(positions_dropdown.html_id, 'value')
     )
     def update_heatmap_players(selected_player, selected_attribute, selected_stat):
+        """
+        Get stats dropdown value, selected attributes, selected players
+        return updates heatmap
+        """
         if selected_player: 
             player_names = [player['customdata'][0] for player in selected_player['points']]
-            print(player_names)
         else: player_names = []
         return heatmap_plot.update(player_names, selected_attribute, selected_stat)
 

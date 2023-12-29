@@ -54,6 +54,25 @@ class Heatmap(html.Div):
             y=df_test.index,
             colorscale='Viridis'))
 
+        #Update the style and colors of the graph
+        fig.update_layout(plot_bgcolor='#26232C',
+            paper_bgcolor='#26232C',
+            modebar_color = '#136d6d',
+            title_font_color='white',
+            legend_font_color='white',
+            legend_title_font_color='white',
+            xaxis = dict(
+            color="#9D9D9D",
+            tickfont_size=14,
+            title_font=dict(size=20, color='#9D9D9D')),
+            yaxis=dict(
+                color="#9D9D9D",
+                titlefont_size=16,
+                tickfont_size=14,
+                gridcolor='#9D9D9D',
+                title_font=dict(size=17, color='#9D9D9D'),
+            ))
+            
         # #Set the color scheme for the plot
         # fig = self.set_fig_style(fig)
 
