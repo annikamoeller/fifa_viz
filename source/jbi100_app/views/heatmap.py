@@ -28,10 +28,13 @@ class Heatmap(html.Div):
         @selected_attribute List(str): Attributes selected form dropdown.
         """
 
-        if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
-        if selected_stat == 'Defender': df = defense_radar_df
-        if selected_stat == 'Midfilder': df = midfielder_radar_df
-        if selected_stat == 'Striker': df = striker_radar_df
+        df = main_df
+
+        # if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
+        # if selected_stat == 'Defender': df = defense_radar_df
+        # if selected_stat == 'Midfilder': df = midfielder_radar_df
+        # if selected_stat == 'Striker': df = striker_radar_df
+
         # fig = go.Figure()
         # fig.add_trace(go.Heatmap(
         #     z=[[1, 20, 30],

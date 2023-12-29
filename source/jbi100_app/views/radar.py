@@ -26,11 +26,6 @@ class Radar(html.Div):
         @hoveredPlayer (str) = The hovered player name
         """
         df = main_df
-        #Get the right dataframe
-        # if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
-        # if selected_stat == 'Defender': df = defense_radar_df
-        # if selected_stat == 'Midfilder': df = midfielder_radar_df
-        # if selected_stat == 'Striker': df = striker_radar_df
 
         #If nothing is clicked or hovered create an empty radar
         if clickedPlayer is None and hoveredPlayer is None: return self.clear(df)
@@ -66,7 +61,7 @@ class Radar(html.Div):
     def clear(self, df):
         """
         Instantiates a radar with empty values
-        df (pandas dataframe): trimmed dataframe (gkdf, defndf, midfdf, strdf) used to get the categories for the radar
+        @df (pandas dataframe): trimmed dataframe (gkdf, defndf, midfdf, strdf) used to get the categories for the radar
         """
         categories = list(df.columns)
 

@@ -24,7 +24,7 @@ if __name__ == '__main__':
     gk_switch = Switch("gk_switch")
     info_card1 = InfoCard("infocard1")
     #info_card2 = InfoCard("infocard2")
-    player_data_table = Table("data_table", main_df, 'birth_year')
+    player_data_table = Table("player_data_table", main_df, 'birth_year')
 
     scatter_vals = list(main_df.columns)
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             # Right column
             html.Div(
                 id="right-column",
-                className="one-half column", #base.css style
+                className="one-half column", #base.css 
                 children=right_menu_plots #plots
             ),
         ],
@@ -119,15 +119,14 @@ if __name__ == '__main__':
             Input(filter_position_dropdown.html_id, 'value')
     )
     def update_table(selected_stat, team, position):
-         new_cols, new_data = player_data_table.update(selected_stat, team, position)
+         new_data, new_cols = player_data_table.update(selected_stat, team, position)
          return new_data, new_cols
          
     # update the radar plot based on click and hover data
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'clickData'),
-    Input(scatter_plot.html_id, 'hoverData'),
-    # Input(positions_dropdown.html_id, 'value'),
+    Input(scatter_plot.html_id, 'hoverData')
     )
     def selected_player(click, hover):
         """
@@ -158,25 +157,13 @@ if __name__ == '__main__':
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
         else: clickedPlayer = None
         return info_card1.update(clickedPlayer)
-         
-    @app.callback(
-        Output(attribute_dropdown.html_id, 'options'),
-        Input(positions_dropdown.html_id, 'value')
-    )
-    def update_heatmap_attribute_options(selected_stat):
-        """
-        Get stats dropdown value 
-        return list of attributes to be shown as options in attribute dropdown
-        """
-        return attribute_dropdown.update(selected_stat)
 
     @app.callback(
         Output(heatmap_plot.html_id, 'figure'),
         Input(scatter_plot.html_id, 'selectedData'),
-        Input(attribute_dropdown.html_id, 'value'),
-        Input(positions_dropdown.html_id, 'value')
+        Input(attribute_dropdown.html_id, 'value')
     )
-    def update_heatmap_players(selected_player, selected_attribute, selected_stat):
+    def update_heatmap_players(selected_player, selected_attribute):
         """
         Get stats dropdown value, selected attributes, selected players
         return updates heatmap
@@ -184,6 +171,11 @@ if __name__ == '__main__':
         if selected_player: 
             player_names = [player['customdata'][0] for player in selected_player['points']]
         else: player_names = []
-        return heatmap_plot.update(player_names, selected_attribute, selected_stat)
+
+        #The heatmap is broken atm because of the changes. Remove the try catch when functional
+        try:
+            return heatmap_plot.update(player_names, selected_attribute)
+        except:
+            return None
 
     app.run_server(debug=True, dev_tools_ui=True)

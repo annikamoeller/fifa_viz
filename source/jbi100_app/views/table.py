@@ -41,6 +41,7 @@ class Table(html.Div):
         df = main_df
         df = df.reset_index()
         if team_filter and position_filter:
+            print(team_filter)
             df = df[df['team']==team_filter]
             df = df[df['position']==position_filter]
         if team_filter and not position_filter:
@@ -50,7 +51,8 @@ class Table(html.Div):
         df = df[['player', selected_stat, 'team']]
 
         columns=[{'name': col, 'id': col} for col in df.columns] 
-        data=df.to_dict('records'),
+        data=df.to_dict('records')
+        
         return data, columns
 
     #Not needed or used for now
