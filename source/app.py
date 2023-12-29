@@ -6,6 +6,7 @@ from jbi100_app.views.dropdown import *
 from jbi100_app.views.radar import *
 from jbi100_app.views.scatterplot import *
 from jbi100_app.views.switch import *
+from jbi100_app.views.heatmap import *
 
 from jbi100_app.views.multival_dropdown import *
 from dash import html
@@ -34,9 +35,9 @@ if __name__ == '__main__':
     positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
     attribute_dropdown = MultiValDropdown("attribute_dropdown", ['A', 'B', 'C'], None, 'Attributes')
 
-    heatmap = Heatmap("heatmap_plot", total_player_df_no_gk)
+    heatmap_plot = Heatmap("heatmap_plot", total_player_df_no_gk)
 
-    left_menu_plots = [gk_switch, x_axis_dropdown, y_axis_dropdown, scatter_plot, attribute_dropdown]
+    left_menu_plots = [gk_switch, x_axis_dropdown, y_axis_dropdown, scatter_plot, attribute_dropdown, heatmap_plot]
     right_menu_plots = [positions_dropdown, radar_plot]
 
     #Create left and right side of the page
@@ -133,10 +134,27 @@ if __name__ == '__main__':
         return radar_plot.update(clickedPlayer, hoveredPlayer, selected_stat)
 
     @app.callback(
-        Input(attribute_dropdown.html_id, 'value'),
-        Output()
+        Output(attribute_dropdown.html_id, 'options'),
+        Input(positions_dropdown.html_id, 'value')
     )
-    def do_something(value_from_dropdown):
-        print(value_from_dropdown)
+    def update_heatmap_attribute_options(selected_stat):
+        """
+        Get stats dropdown value 
+        return list of attributes to be shown as options in attribute dropdown
+        """
+        return attribute_dropdown.update(selected_stat)
+
+    @app.callback(
+        Output(heatmap_plot.html_id, 'figure'),
+        Input(scatter_plot.html_id, 'selectedData'),
+        Input(attribute_dropdown.html_id, 'value'),
+        Input(positions_dropdown.html_id, 'value')
+    )
+    def update_heatmap_players(selected_player, selected_attribute, selected_stat):
+        if selected_player: 
+            player_names = [player['customdata'][0] for player in selected_player['points']]
+            print(player_names)
+        else: player_names = []
+        return heatmap_plot.update(player_names, selected_attribute, selected_stat)
 
     app.run_server(debug=True, dev_tools_ui=True)

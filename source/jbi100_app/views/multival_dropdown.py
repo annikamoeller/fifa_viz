@@ -1,4 +1,5 @@
 from dash import dcc, html
+from jbi100_app.config import *
 
 class MultiValDropdown(html.Div):
     def __init__(self, name, dropDownValues, startingValue, label=None, df=None):
@@ -19,3 +20,10 @@ class MultiValDropdown(html.Div):
                 )
             ], style={'margin': 'auto', 'width': '17%', 'color': 'black'}
         )
+
+    def update(self, selected_stat):
+        if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
+        if selected_stat == 'Defender': df = defense_radar_df
+        if selected_stat == 'Midfilder': df = midfielder_radar_df
+        if selected_stat == 'Striker': df = striker_radar_df
+        return df.columns.tolist()
