@@ -26,10 +26,10 @@ class Dropdown(html.Div):
                     value=startingValue,
                     multi=multiple_values
                 )
-            ], style={'margin': 'auto', 'width': '17%', 'color': 'black'} #Style of the dropdown
+            ], style={'margin': 'auto', 'width': '45%', 'color': 'black', 'padding': 10} #Style of the dropdown
         )
 
     def update(self, on):
-        if on: return list(goalkeeping_radar_df.columns), list(goalkeeping_radar_df.columns)[0]
-        else: return list(total_player_df_no_gk.columns), list(total_player_df_no_gk.columns)[0]
+        if on: return list(gk_df.columns), list(gk_df.columns)[0]
+        else: return list(main_df.columns), list(main_df.columns)[0]
         

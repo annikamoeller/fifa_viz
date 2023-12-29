@@ -20,17 +20,17 @@ class Radar(html.Div):
             style={'margin': 'auto', 'width': '70%','text-align': 'center', 'padding': 20}
         )
     
-    def update(self, clickedPlayer=None, hoveredPlayer=None, selected_stat=None):
+    def update(self, clickedPlayer=None, hoveredPlayer=None):
         """ 
         @clickedPlayer (str) = The clicked player name
         @hoveredPlayer (str) = The hovered player name
         """
-        
+        df = main_df
         #Get the right dataframe
-        if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
-        if selected_stat == 'Defender': df = defense_radar_df
-        if selected_stat == 'Midfilder': df = midfielder_radar_df
-        if selected_stat == 'Striker': df = striker_radar_df
+        # if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
+        # if selected_stat == 'Defender': df = defense_radar_df
+        # if selected_stat == 'Midfilder': df = midfielder_radar_df
+        # if selected_stat == 'Striker': df = striker_radar_df
 
         #If nothing is clicked or hovered create an empty radar
         if clickedPlayer is None and hoveredPlayer is None: return self.clear(df)

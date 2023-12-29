@@ -6,12 +6,11 @@ from jbi100_app.views.dropdown import *
 from jbi100_app.views.radar import *
 from jbi100_app.views.scatterplot import *
 from jbi100_app.views.switch import *
+from jbi100_app.views.infoCard import *
+from jbi100_app.views.table import *
 
 from dash import html
-import plotly.express as px
 from dash.dependencies import Input, Output
-from PIL import Image
-import dash_daq as daq
 
 if __name__ == '__main__':
 
@@ -19,21 +18,27 @@ if __name__ == '__main__':
     This is the main layout of the webpage, its children are then sub divided
     into further html layouts 
     """
-    #teams_for_dropdown = [team for team in teams_list]
+    teams_for_dropdown = [team for team in teams_list]
     gk_switch = Switch("gk_switch")
+    info_card1 = InfoCard("infocard1")
+    #info_card2 = InfoCard("infocard2")
+    player_data_table = Table("data_table", main_df, 'birth_year')
 
-    scatter_vals = list(total_player_df_no_gk.columns)
+    scatter_vals = list(main_df.columns)
 
-    scatter_plot = Scatterplot("scatterplot", total_player_df_no_gk)
-    radar_plot = Radar("radar", total_player_df_no_gk)
+    scatter_plot = Scatterplot("scatterplot", main_df)
+    radar_plot = Radar("radar", main_df)
     x_axis_dropdown = Dropdown("x_axis_dropdown", scatter_vals, scatter_vals[0], 'X-Axis Values')
     y_axis_dropdown = Dropdown("y_axis_dropdown", scatter_vals, scatter_vals[0], 'Y-Axis Values')
 
-    #teams_dropdown = Dropdown("teams_dropdown", teams_for_dropdown, teams_for_dropdown[0], 'Team')
-    positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
+    table_stat_dropdown = Dropdown("stat_dd", list(main_df.columns), list(main_df.columns)[0], 'Select statistic')
+    filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF', 'GK'], None, 'Filter by position', multiple_values=True)
+    filter_team_dropdown = Dropdown("team_dd", teams_for_dropdown, None, 'Filter by team', multiple_values=True)
 
-    left_menu_plots = [gk_switch, x_axis_dropdown, y_axis_dropdown, scatter_plot]
-    right_menu_plots = [positions_dropdown, radar_plot]
+    table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
+    
+    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, x_axis_dropdown, y_axis_dropdown, scatter_plot]
+    right_menu_plots = [radar_plot, info_card1]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -99,21 +104,31 @@ if __name__ == '__main__':
         """
         return scatter_plot.update(on, x_label, y_label)
     
-    
+    #update the table based on the drop downs
+    @app.callback(
+            Output(player_data_table.html_id, 'data'),
+            Output(player_data_table.html_id, 'columns'),
+            Input(table_stat_dropdown.html_id, 'value'),
+            Input(filter_team_dropdown.html_id, 'value'),
+            Input(filter_position_dropdown.html_id, 'value')
+    )
+    def update_table(selected_stat, team, position):
+         new_cols, new_data = player_data_table.update(selected_stat, team, position)
+         return new_data, new_cols
+         
     # update the radar plot based on click and hover data
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'clickData'),
     Input(scatter_plot.html_id, 'hoverData'),
-    Input(positions_dropdown.html_id, 'value'),
+    # Input(positions_dropdown.html_id, 'value'),
     )
-    def selected_player(click, hover, selected_stat):
+    def selected_player(click, hover):
         """
         Get clicked, hovered player and stats dropdown value 
         return a radar figure with the stats of the selected players and dropdown
         """
         newPlayerClicked = False
-        
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
         else: clickedPlayer = None
 
@@ -126,6 +141,16 @@ if __name__ == '__main__':
         if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
         else: hoveredPlayer = None
         
-        return radar_plot.update(clickedPlayer, hoveredPlayer, selected_stat)
+        return radar_plot.update(clickedPlayer, hoveredPlayer)
 
+    # update info card to display basic player info when clicked on in scatter plot 
+    @app.callback(
+        Output(info_card1.html_id, 'value'),
+        Input(scatter_plot.html_id, 'clickData')
+    )
+    def info_card(click):
+        if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
+        else: clickedPlayer = None
+        return info_card1.update(clickedPlayer)
+         
     app.run_server(debug=True, dev_tools_ui=True)

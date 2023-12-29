@@ -30,10 +30,10 @@ class Scatterplot(html.Div):
         @team (str): the team for the scatter plot
         @returns ->>> figure class with new plot
         """
-        if on: df = goalkeeping_radar_df.reset_index()
-        else: df = total_player_df_no_gk.reset_index()
+        if on: df = gk_df.reset_index()
+        else: df = main_df.reset_index()
         print(x_axis_label, y_axis_label)
-        fig = px.scatter(df, x=x_axis_label, y=y_axis_label, hover_data='player')
+        fig = px.scatter(df, x=x_axis_label, y=y_axis_label, hover_data='player', color='position')
 
         #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
