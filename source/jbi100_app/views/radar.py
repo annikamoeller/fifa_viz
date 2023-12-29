@@ -4,12 +4,13 @@ from dash import dcc, html
 import plotly.graph_objs as go
 
 class Radar(html.Div):
-    def __init__(self, name, player1, player2, df):
+    def __init__(self, name, df):
+        """
+        @name (str): used for the html_id
+        @df (df): main dataframe to be used
+        """
         self.html_id = name.lower().replace(" ", "-")
         self.df = df
-        self.player1 = player1
-        self.player2 = player2
-
 
         # Equivalent to `html.Div([...])`
         super().__init__(
@@ -20,14 +21,18 @@ class Radar(html.Div):
         )
     
     def update(self, clickedPlayer=None, hoveredPlayer=None, selected_stat=None):
-        """ @clickedPlayer (str) = The clicked player name
-            @hoveredPlayer (str) = The hovered player name"""
+        """ 
+        @clickedPlayer (str) = The clicked player name
+        @hoveredPlayer (str) = The hovered player name
+        """
         
+        #Get the right dataframe
         if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
         if selected_stat == 'Defender': df = defense_radar_df
         if selected_stat == 'Midfilder': df = midfielder_radar_df
         if selected_stat == 'Striker': df = striker_radar_df
 
+        #If nothing is clicked or hovered create an empty radar
         if clickedPlayer is None and hoveredPlayer is None: return self.clear(df)
 
         categories = list(df.columns)
@@ -38,8 +43,8 @@ class Radar(html.Div):
             player_values = df.loc[clickedPlayer].values
 
             fig.add_trace(go.Scatterpolar(
-                r=player_values,
-                theta=categories,
+                r=player_values, #array of values for each label
+                theta=categories, #array of labels
                 fill='toself',
                 name=clickedPlayer
             ))
@@ -47,23 +52,23 @@ class Radar(html.Div):
         if hoveredPlayer:
             player_values = df.loc[hoveredPlayer].values
             fig.add_trace(go.Scatterpolar(
-                r=player_values,
-                theta=categories,
+                r=player_values, #array of values for each label
+                theta=categories, #array of labels
                 fill='toself',
                 name=hoveredPlayer
             ))
 
+        #Set the color scheme for the plot
         fig = self.set_fig_style(fig)
 
         return fig
     
     def clear(self, df):
-        print(df)
+        """
+        Instantiates a radar with empty values
+        df (pandas dataframe): trimmed dataframe (gkdf, defndf, midfdf, strdf) used to get the categories for the radar
+        """
         categories = list(df.columns)
-        empty_values = []
-
-        for value in categories:
-            empty_values.append(0)
 
         fig = go.Figure()
 
@@ -79,12 +84,15 @@ class Radar(html.Div):
         return fig
     
     def set_fig_style(self, fig):
+        """
+        Updates a figures style
+        @fig (figure): a graph figure to be updated
+        """
+
+        #add legend range for the radar axis and background colors
         fig.update_layout(plot_bgcolor='white',
             paper_bgcolor='#26232C',
             modebar_color = '#136d6d',
-            title_font_color='white',
-            legend_font_color='white',
-            legend_title_font_color='white',
             showlegend=True,
             polar=dict(
                 radialaxis=dict(
@@ -93,6 +101,7 @@ class Radar(html.Div):
                 color="white",
                 )))
         
+        #update the radar colors
         fig.update_polars(bgcolor="#9D9D9D", angularaxis=dict(color="#9D9D9D"))
         
         return fig

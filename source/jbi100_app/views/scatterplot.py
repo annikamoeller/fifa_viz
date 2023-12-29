@@ -4,11 +4,17 @@ from ..config import *
 import plotly.express as px
 
 class Scatterplot(html.Div):
-    def __init__(self, name, feature_x, feature_y, df):
+    def __init__(self, name, df):
+        """
+        @name (str): used for the html_id
+        @feature_x (str): x-axis value that matches df column
+        @feature_y (str): y-axis value that matches df column
+        @df (df): main dataframe to be used
+        """
         self.html_id = name.lower().replace(" ", "-")
         self.df = df
-        self.feature_x = feature_x
-        self.feature_y = feature_y
+        # self.feature_x = feature_x
+        # self.feature_y = feature_y
         self.clickPlayer = None
 
         # Equivalent to `html.Div([...])`
@@ -19,13 +25,17 @@ class Scatterplot(html.Div):
             style={'margin': 'auto', 'width': '70%', 'padding': 20}
         )
     
-    def update(self, x_axis_values=None):
-        df = player_stats
+    def update(self, on, x_axis_label=None, y_axis_label=None):
+        """
+        @team (str): the team for the scatter plot
+        @returns ->>> figure class with new plot
+        """
+        if on: df = goalkeeping_radar_df.reset_index()
+        else: df = total_player_df_no_gk.reset_index()
+        print(x_axis_label, y_axis_label)
+        fig = px.scatter(df, x=x_axis_label, y=y_axis_label, hover_data='player')
 
-        if x_axis_values is not None:
-            df = df[df['team'] == x_axis_values]
-        fig = px.scatter(df, x=self.feature_x, y=self.feature_y, color='team', hover_data='player')
-
+        #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
             modebar_color = '#136d6d',
@@ -46,8 +56,10 @@ class Scatterplot(html.Div):
         
         return fig
 
+    #Not needed or used for now
     def get_click_player(self):
         return self.clickPlayer
     
+    #Not needed or used for now
     def set_click_player(self, clickedPlayer):
         self.clickPlayer = clickedPlayer
