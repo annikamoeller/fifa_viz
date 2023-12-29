@@ -32,9 +32,11 @@ if __name__ == '__main__':
 
     #teams_dropdown = Dropdown("teams_dropdown", teams_for_dropdown, teams_for_dropdown[0], 'Team')
     positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
-    attribute_dropdown = MultiValDropdown("attribute_dropdown", example_attributes, None, 'Attributes')
+    attribute_dropdown = MultiValDropdown("attribute_dropdown", ['A', 'B', 'C'], None, 'Attributes')
 
-    left_menu_plots = [gk_switch, x_axis_dropdown, y_axis_dropdown, scatter_plot]
+    heatmap = Heatmap("heatmap_plot", total_player_df_no_gk)
+
+    left_menu_plots = [gk_switch, x_axis_dropdown, y_axis_dropdown, scatter_plot, attribute_dropdown]
     right_menu_plots = [positions_dropdown, radar_plot]
 
     #Create left and right side of the page
@@ -129,5 +131,12 @@ if __name__ == '__main__':
         else: hoveredPlayer = None
         
         return radar_plot.update(clickedPlayer, hoveredPlayer, selected_stat)
+
+    @app.callback(
+        Input(attribute_dropdown.html_id, 'value'),
+        Output()
+    )
+    def do_something(value_from_dropdown):
+        print(value_from_dropdown)
 
     app.run_server(debug=True, dev_tools_ui=True)
