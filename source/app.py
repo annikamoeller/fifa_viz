@@ -6,9 +6,11 @@ from jbi100_app.views.dropdown import *
 from jbi100_app.views.radar import *
 from jbi100_app.views.scatterplot import *
 from jbi100_app.views.switch import *
+from jbi100_app.views.heatmap import *
 from jbi100_app.views.infoCard import *
 from jbi100_app.views.table import *
 
+from jbi100_app.views.multival_dropdown import *
 from dash import html
 from dash.dependencies import Input, Output
 
@@ -30,14 +32,18 @@ if __name__ == '__main__':
     radar_plot = Radar("radar", main_df)
     x_axis_dropdown = Dropdown("x_axis_dropdown", scatter_vals, scatter_vals[0], 'X-Axis Values')
     y_axis_dropdown = Dropdown("y_axis_dropdown", scatter_vals, scatter_vals[0], 'Y-Axis Values')
+    positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
 
     table_stat_dropdown = Dropdown("stat_dd", list(main_df.columns), list(main_df.columns)[0], 'Select statistic')
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF', 'GK'], None, 'Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_for_dropdown, None, 'Filter by team', multiple_values=True)
 
     table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
-    
-    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, x_axis_dropdown, y_axis_dropdown, scatter_plot]
+    attribute_dropdown = MultiValDropdown("attribute_dropdown", ['A', 'B', 'C'], None, 'Attributes')
+
+    heatmap_plot = Heatmap("heatmap_plot", main_df)
+
+    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, x_axis_dropdown, y_axis_dropdown, scatter_plot, attribute_dropdown, heatmap_plot]
     right_menu_plots = [radar_plot, info_card1]
 
     #Create left and right side of the page
@@ -153,4 +159,31 @@ if __name__ == '__main__':
         else: clickedPlayer = None
         return info_card1.update(clickedPlayer)
          
+    @app.callback(
+        Output(attribute_dropdown.html_id, 'options'),
+        Input(positions_dropdown.html_id, 'value')
+    )
+    def update_heatmap_attribute_options(selected_stat):
+        """
+        Get stats dropdown value 
+        return list of attributes to be shown as options in attribute dropdown
+        """
+        return attribute_dropdown.update(selected_stat)
+
+    @app.callback(
+        Output(heatmap_plot.html_id, 'figure'),
+        Input(scatter_plot.html_id, 'selectedData'),
+        Input(attribute_dropdown.html_id, 'value'),
+        Input(positions_dropdown.html_id, 'value')
+    )
+    def update_heatmap_players(selected_player, selected_attribute, selected_stat):
+        """
+        Get stats dropdown value, selected attributes, selected players
+        return updates heatmap
+        """
+        if selected_player: 
+            player_names = [player['customdata'][0] for player in selected_player['points']]
+        else: player_names = []
+        return heatmap_plot.update(player_names, selected_attribute, selected_stat)
+
     app.run_server(debug=True, dev_tools_ui=True)
