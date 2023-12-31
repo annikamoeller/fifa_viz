@@ -20,35 +20,47 @@ if __name__ == '__main__':
     This is the main layout of the webpage, its children are then sub divided
     into further html layouts 
     """
-    teams_for_dropdown = [team for team in teams_list]
-    stats_for_dropdown = list(main_df.columns)
-    stats_for_dropdown.remove('team')
-    stats_for_dropdown.remove('position')
-
+    # goalkeeper mode switch
     gk_switch = Switch("gk_switch")
-    info_card1 = InfoCard("infocard1")
-    #info_card2 = InfoCard("infocard2")
+
+    # Table elements 
     player_data_table = Table("player_data_table", main_df, 'birth_year')
-
-    scatter_vals = list(main_df.columns)
-
-    scatter_plot = Scatterplot("scatterplot", main_df)
-    radar_plot = Radar("radar", main_df)
-    x_axis_dropdown = Dropdown("x_axis_dropdown", scatter_vals, scatter_vals[0], 'X-Axis Values')
-    y_axis_dropdown = Dropdown("y_axis_dropdown", scatter_vals, scatter_vals[0], 'Y-Axis Values')
-    positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
-
-    table_stat_dropdown = Dropdown("stat_dd", stats_for_dropdown, stats_for_dropdown[0], 'Select statistic')
+    # drop downs 
+    table_stat_dropdown = Dropdown("stat_dd", player_stats, player_stats[0], 'Select statistic')
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF', 'GK'], None, 'Filter by position', multiple_values=True)
-    filter_team_dropdown = Dropdown("team_dd", teams_for_dropdown, None, 'Filter by team', multiple_values=True)
-
+    filter_team_dropdown = Dropdown("team_dd", teams_list, None, 'Filter by team', multiple_values=True)
+    # group dropdowns together horizontally
     table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
+
+    # Scatter plot
+    scatter_plot = Scatterplot("scatterplot", main_df)
+    
+    # drop downs for scatter plot 
+    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats, startingValue=player_stats[0], label='X-Axis Values')
+    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats, startingValue=player_stats[1], label='Y-Axis Values')
+    # group dropdowns together horizontally
+    scatter_dropdowns = html.Div([x_axis_dropdown, y_axis_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
+
+    # Radar plot
+    radar_plot = Radar("radar", main_df)
+
+    # player 1 info card
+    info_card1 = InfoCard("infocard1")
+
+    # player 2 info card
+    #info_card2 = InfoCard("infocard2")
+
+    # radar and info card grouping 
+    radar_and_info = html.Div([radar_plot, info_card1], style={'display': 'flex', 'flexDirection': 'row'})
+
+    # Heatmap plot
+    heatmap_plot = Heatmap("heatmap_plot", main_df)
+    # stat dropdown for heatmap 
     attribute_dropdown = MultiValDropdown("attribute_dropdown", ['A', 'B', 'C'], None, 'Attributes')
 
-    heatmap_plot = Heatmap("heatmap_plot", main_df)
-
-    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, x_axis_dropdown, y_axis_dropdown, scatter_plot, attribute_dropdown, heatmap_plot]
-    right_menu_plots = [radar_plot, info_card1]
+    # Set up page on left and right
+    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, radar_and_info, attribute_dropdown, heatmap_plot]
+    right_menu_plots = [scatter_dropdowns, scatter_plot]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -88,7 +100,7 @@ if __name__ == '__main__':
         and we take as input the field value of the html.Div select-team
         in this case, the drop-down menu value
     """
-
+    # toggle goalkeeper mode 
     @app.callback(
         Output(x_axis_dropdown.html_id, 'options'),
         Output(x_axis_dropdown.html_id, 'value'),
@@ -106,15 +118,17 @@ if __name__ == '__main__':
         Output(scatter_plot.html_id, 'figure'),
         Input(gk_switch.html_id, 'on'),
         Input(x_axis_dropdown.html_id, "value"),
-        Input(y_axis_dropdown.html_id, "value")
+        Input(y_axis_dropdown.html_id, "value"),
+        Input(filter_team_dropdown.html_id, 'value'),
+        Input(filter_position_dropdown.html_id, 'value')
     )
-    def selected_x_y_labels(on, x_label, y_label):
+    def update_scatter(on, x_label, y_label, team_filter, position_filter):
         """
         Return a figure with a teams plot based on team dropdown value 
         """
-        return scatter_plot.update(on, x_label, y_label)
+        return scatter_plot.update(on, x_label, y_label, team_filter, position_filter)
     
-    #update the table based on the drop downs
+    # update the table based on the drop downs
     @app.callback(
             Output(player_data_table.html_id, 'data'),
             Output(player_data_table.html_id, 'columns'),
@@ -125,7 +139,7 @@ if __name__ == '__main__':
     def update_table(selected_stat, team, position):
          new_data, new_cols = player_data_table.update(selected_stat, team, position)
          return new_data, new_cols
-         
+  
     # update the radar plot based on click and hover data
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
@@ -161,7 +175,7 @@ if __name__ == '__main__':
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
         else: clickedPlayer = None
         return info_card1.update(clickedPlayer)
-
+    
     @app.callback(
         Output(heatmap_plot.html_id, 'figure'),
         Input(scatter_plot.html_id, 'selectedData'),

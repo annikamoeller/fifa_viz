@@ -2,6 +2,7 @@ from dash import dcc, html
 import plotly.graph_objects as go
 from ..config import *
 import plotly.express as px
+from ..common import *
 
 class Scatterplot(html.Div):
     def __init__(self, name, df):
@@ -12,29 +13,35 @@ class Scatterplot(html.Div):
         @df (df): main dataframe to be used
         """
         self.html_id = name.lower().replace(" ", "-")
-        self.df = df
-        # self.feature_x = feature_x
-        # self.feature_y = feature_y
         self.clickPlayer = None
+        self.df = df
 
         # Equivalent to `html.Div([...])`
         super().__init__(
             className="graph_card",
             children=
                 dcc.Graph(id=self.html_id),
-            style={'margin': 'auto', 'width': '70%', 'padding': 20}
+            style={'margin': 'auto', 'width': '100%', 'height': 400, 'padding': 10}
         )
-    
-    def update(self, on, x_axis_label=None, y_axis_label=None):
+
+    def update(self, on, x_axis_stat, y_axis_stat, team_filter, position_filter):
         """
-        @team (str): the team for the scatter plot
+        @on (str): whether or not goalkeeper mode is on
+        @x_axis_stat (str): statistic chosen for x-axis 
+        @y_axis_stat (str): statistic chosen for y-axis
+        @team_filter (str): team to filter results by
+        @position_filter (str): playing position to filter by
         @returns ->>> figure class with new plot
         """
         if on: df = gk_df.reset_index()
         else: df = main_df.reset_index()
-        print(x_axis_label, y_axis_label)
-        fig = px.scatter(df, x=x_axis_label, y=y_axis_label, hover_data='player', color='position')
 
+        df = filter_df(df, team_filter, position_filter)
+        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
+
+        return self.update_layout(fig)
+        
+    def update_layout(self, fig):
         #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
@@ -53,7 +60,6 @@ class Scatterplot(html.Div):
                 gridcolor='#9D9D9D',
                 title_font=dict(size=17, color='#9D9D9D'),
             ))
-        
         return fig
 
     #Not needed or used for now

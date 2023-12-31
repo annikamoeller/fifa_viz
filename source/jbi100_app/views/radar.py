@@ -17,7 +17,7 @@ class Radar(html.Div):
             className="graph_card",
             children=
                 dcc.Graph(id=self.html_id),
-            style={'margin': 'auto', 'width': '70%','text-align': 'center', 'padding': 20}
+            style={'margin': 'auto', 'width': '70%', 'text-align': 'center', 'padding': 20}
         )
     
     def update(self, clickedPlayer=None, hoveredPlayer=None):
@@ -25,7 +25,7 @@ class Radar(html.Div):
         @clickedPlayer (str) = The clicked player name
         @hoveredPlayer (str) = The hovered player name
         """
-        df = main_df
+        df = self.df
 
         #If nothing is clicked or hovered create an empty radar
         if clickedPlayer is None and hoveredPlayer is None: return self.clear(df)
