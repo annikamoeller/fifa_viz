@@ -5,19 +5,67 @@ import plotly.express as px
 from dash import dash_table
 from ..common import *
 
+from sklearn.metrics import pairwise_distances
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
 class Table(html.Div):
     def __init__(self, name, df, selected_stat):
         """
         @name (str): used for the html_id
         @df (df): main dataframe to be used
-        @selected_stat (str): the statistic to be displayed
+        @selected_stat (str): stat that the df is sorted by
         """
-        self.html_id = name.lower().replace(" ", "-")
-        df = df.reset_index()
-        self.selected_stat = selected_stat
-        df = rank_df(df, selected_stat)
 
-        self.clickPlayer = None
+        self.html_id = name.lower().replace(" ", "-")
+
+        if df is not None:
+            df = df.reset_index()
+            self.selected_stat = selected_stat
+            df = df[['player', self.selected_stat, 'team', 'position']]
+            df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
+            df = df[['rank', 'player', 'team', selected_stat, 'position']]
+            df = df.sort_values(by=selected_stat, ascending=False)
+
+            self.clickPlayer = None
+
+            # Main table
+            super().__init__(
+                className="graph_card",
+                children=
+                    dash_table.DataTable(
+                                    id=self.html_id,
+                                    columns=[{'name': col, 'id': col} for col in df.columns],
+                                    data=df.to_dict('records'),
+                                    style_table={'height': '300px', 'overflowY': 'scroll'},
+                                    style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+                                    #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
+                                    style_data={'color': 'black'},
+                                    style_cell_conditional=[
+                                    {'if': {'column_id': 'player'}, 'width': '50%'},
+                                    {'if': {'column_id': self.selected_stat}, 'width': '20%'},
+                                    {'if': {'column_id': 'team'}, 'width': '30%'},
+            ]
+                                    ),
+                style={'margin': 'auto', 'width': '90%', 'padding': 10}
+            )
+
+        else:
+            # Just an empty table for now.
+            super().__init__(
+                className="graph_card",
+                children=
+                    dash_table.DataTable(
+                                    id=self.html_id,
+                                    columns=[],
+                                    style_table={'height': '300px', 'overflowY': 'scroll'},
+                                    style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+                                    #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
+                                    style_data={'color': 'black'}
+                                    ),
+                style={'margin': 'auto', 'width': '90%', 'padding': 10}
+            )
 
         # Equivalent to `html.Div([...])`
         super().__init__(
@@ -25,17 +73,11 @@ class Table(html.Div):
             children=
                 dash_table.DataTable(
                                 id=self.html_id,
-                                columns=[{'name': col, 'id': col} for col in df.columns],
-                                data=df.to_dict('records'),
+                                columns=[],
                                 style_table={'height': '500px', 'overflowY': 'scroll'},
                                 style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
                                 #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
-                                style_data={'color': 'black'},
-                                style_cell_conditional=[
-                                {'if': {'column_id': 'player'}, 'width': '50%'},
-                                {'if': {'column_id': self.selected_stat}, 'width': '20%'},
-                                {'if': {'column_id': 'team'}, 'width': '30%'},
-                                ]
+                                style_data={'color': 'black'}
                                 ),
             style={'margin': 'auto', 'width': '100%', 'padding': 10}
             )
@@ -55,7 +97,6 @@ class Table(html.Div):
         columns=[{'name': col, 'id': col} for col in df.columns]
         data=df.to_dict('records')
         
-        print(columns)
         return data, columns
 
     #Not needed or used for now
@@ -65,3 +106,35 @@ class Table(html.Div):
     #Not needed or used for now
     def set_click_player(self, clickedPlayer):
         self.clickPlayer = clickedPlayer
+
+    def get_similar_players(self, player, num_similar_players=5):
+        """
+        @player (str): the player for which we want similar players
+        @num_similar_players (str): the number of players that we want returned
+        @returns ->>> similar player data and columns for table
+        """
+        df = main_df
+
+        cleanup_pos = {"position": {"GK": 1, "DF": 2, "MF": 3, "FW": 4}}
+        df = df.replace(cleanup_pos)
+        df = df.drop(columns='team')
+        df = df.drop(columns='birth_year')
+
+        player = df.loc[player].values
+        player = player.reshape(1, -1)
+        df = df.dropna()
+ 
+        result = cosine_similarity(player, df)
+
+        result = np.array(result)
+        result = result.round(8)
+
+        x = np.argsort(result[0])[::-1][:num_similar_players]
+      
+        similar_player_df = df.iloc[x]
+        similar_player_df = similar_player_df.reset_index()
+
+        similar_player_data = similar_player_df.to_dict('records')
+        columns=[{'name': col, 'id': col} for col in similar_player_df.columns]
+
+        return similar_player_data, columns

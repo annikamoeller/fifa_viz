@@ -14,6 +14,7 @@ from jbi100_app.views.multival_dropdown import *
 from dash import html
 from dash.dependencies import Input, Output
 
+
 if __name__ == '__main__':
 
     """ 
@@ -25,6 +26,7 @@ if __name__ == '__main__':
 
     # Table elements 
     player_data_table = Table("player_data_table", main_df, 'birth_year')
+    similar_player_table = Table("similar_player_table", None, 'birth_year')
     # drop downs 
     table_stat_dropdown = Dropdown("stat_dd", player_stats, player_stats[0], 'Select statistic')
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF', 'GK'], None, 'Filter by position', multiple_values=True)
@@ -60,7 +62,7 @@ if __name__ == '__main__':
 
     # Set up page on left and right
     left_menu_plots = [gk_switch, table_dropdowns, player_data_table, radar_and_info, attribute_dropdown, heatmap_plot]
-    right_menu_plots = [scatter_dropdowns, scatter_plot]
+    right_menu_plots = [scatter_dropdowns, scatter_plot, similar_player_table]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -137,9 +139,25 @@ if __name__ == '__main__':
             Input(filter_position_dropdown.html_id, 'value')
     )
     def update_table(selected_stat, team, position):
-         new_data, new_cols = player_data_table.update(selected_stat, team, position)
-         return new_data, new_cols
-  
+        new_data, new_cols = player_data_table.update(selected_stat, team, position)
+        return new_data, new_cols
+         
+    #update the similar player table
+    @app.callback(
+            Output(similar_player_table.html_id, 'data'),
+            Output(similar_player_table.html_id, 'columns'),
+            Input(player_data_table.html_id, 'data'),
+            Input(player_data_table.html_id, 'active_cell'),
+            Input(player_data_table.html_id, 'columns')
+    )
+    def update_table(data, clicked_cell, columns):
+        player = data[clicked_cell['row']]['player']
+
+        if player:
+            new_data, columns = similar_player_table.get_similar_players(player)
+            
+        return new_data, columns
+    
     # update the radar plot based on click and hover data
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
