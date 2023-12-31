@@ -14,7 +14,12 @@ class Table(html.Div):
         """
         self.html_id = name.lower().replace(" ", "-")
         df = df.reset_index()
-        df = df[['player', selected_stat, 'team']]
+        self.selected_stat = selected_stat
+        df = df[['player', self.selected_stat, 'team', 'position']]
+        df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
+        df = df[['rank', 'player', 'team', selected_stat, 'position']]
+        df = df.sort_values(by=selected_stat, ascending=False)
+
         self.clickPlayer = None
 
         # Equivalent to `html.Div([...])`
@@ -27,10 +32,15 @@ class Table(html.Div):
                                 data=df.to_dict('records'),
                                 style_table={'height': '300px', 'overflowY': 'scroll'},
                                 style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
-                                style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
-                                style_data={'color': 'black'}
+                                #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
+                                style_data={'color': 'black'},
+                                style_cell_conditional=[
+                                {'if': {'column_id': 'player'}, 'width': '50%'},
+                                {'if': {'column_id': self.selected_stat}, 'width': '20%'},
+                                {'if': {'column_id': 'team'}, 'width': '30%'},
+        ]
                                 ),
-            style={'margin': 'auto', 'width': '100%', 'padding': 10}
+            style={'margin': 'auto', 'width': '90%', 'padding': 10}
         )
     
     def update(self, selected_stat, team_filter=None, position_filter=None):
@@ -42,17 +52,22 @@ class Table(html.Div):
         df = df.reset_index()
         if team_filter and position_filter:
             print(team_filter)
-            df = df[df['team']==team_filter]
-            df = df[df['position']==position_filter]
+            df = df[df['team'].isin(team_filter)]
+            df = df[df['position'].isin(position_filter)]
         if team_filter and not position_filter:
-            df = df[df['team']==team_filter]
+            df = df[df['team'].isin(team_filter)]
         if position_filter and not team_filter:
-            df = df[df['position']==position_filter]
-        df = df[['player', selected_stat, 'team']]
+            df = df[df['position'].isin(position_filter)]
+        df = df[['player', selected_stat, 'team', 'position']]
 
-        columns=[{'name': col, 'id': col} for col in df.columns] 
+        df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
+        df = df[['rank', 'player', 'team', selected_stat, 'position']]
+
+        columns=[{'name': col, 'id': col} for col in df.columns]
+        df = df.sort_values(by=selected_stat, ascending=False)
         data=df.to_dict('records')
         
+        print(columns)
         return data, columns
 
     #Not needed or used for now

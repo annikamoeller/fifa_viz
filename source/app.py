@@ -21,6 +21,10 @@ if __name__ == '__main__':
     into further html layouts 
     """
     teams_for_dropdown = [team for team in teams_list]
+    stats_for_dropdown = list(main_df.columns)
+    stats_for_dropdown.remove('team')
+    stats_for_dropdown.remove('position')
+
     gk_switch = Switch("gk_switch")
     info_card1 = InfoCard("infocard1")
     #info_card2 = InfoCard("infocard2")
@@ -34,7 +38,7 @@ if __name__ == '__main__':
     y_axis_dropdown = Dropdown("y_axis_dropdown", scatter_vals, scatter_vals[0], 'Y-Axis Values')
     positions_dropdown = Dropdown("positions_dropdown", ['Goalkeeper', 'Defender', 'Midfilder', 'Striker'], 'Defender', 'Stat')
 
-    table_stat_dropdown = Dropdown("stat_dd", list(main_df.columns), list(main_df.columns)[0], 'Select statistic')
+    table_stat_dropdown = Dropdown("stat_dd", stats_for_dropdown, stats_for_dropdown[0], 'Select statistic')
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF', 'GK'], None, 'Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_for_dropdown, None, 'Filter by team', multiple_values=True)
 

@@ -6,7 +6,6 @@ If you want to modify them make a new dataframe
 (e.g. df = player_stats) and use that instead"""
 
 team_data = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Team Data/team_data.csv', delimiter=',')
-teams_list = team_data['team']
 player_stats = pd.read_csv('../../fifa_viz/FIFA Dataset/Data/FIFA World Cup 2022 Player Data/player_shooting.csv', delimiter=',')
 
 # Player data
@@ -56,7 +55,8 @@ position = df_player_misc['position']
 team = df_player_misc['team']
 
 main_df = pd.concat([goals, xg, birth_year, assists, appearances, yellow_cards, red_cards, passes, touches, shots, offsides, tackles, fouls, dispossessed, own_goals, clearances, position, team], axis=1)
-
+teams_list = main_df['team'].unique()
+main_df.fillna("No data")
 # goalkeeper df
 gk_df = pd.merge(df_player_keepers[['player', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
 gk_df = gk_df.set_index('player')
