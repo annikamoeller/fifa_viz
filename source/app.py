@@ -61,8 +61,8 @@ if __name__ == '__main__':
     attribute_dropdown = MultiValDropdown("attribute_dropdown", ['A', 'B', 'C'], None, 'Attributes')
 
     # Set up page on left and right
-    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, radar_and_info, attribute_dropdown, heatmap_plot]
-    right_menu_plots = [scatter_dropdowns, scatter_plot, similar_player_table]
+    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, radar_and_info]
+    right_menu_plots = [scatter_dropdowns, scatter_plot, similar_player_table, heatmap_plot]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -142,21 +142,22 @@ if __name__ == '__main__':
         new_data, new_cols = player_data_table.update(selected_stat, team, position)
         return new_data, new_cols
          
-    #update the similar player table
+    #update the similar player table and heatmap
     @app.callback(
             Output(similar_player_table.html_id, 'data'),
             Output(similar_player_table.html_id, 'columns'),
+            Output(heatmap_plot.html_id, 'figure'),
             Input(player_data_table.html_id, 'data'),
             Input(player_data_table.html_id, 'active_cell'),
             Input(player_data_table.html_id, 'columns')
     )
-    def update_table(data, clicked_cell, columns):
+    def update_similar_players(data, clicked_cell, columns):
         player = data[clicked_cell['row']]['player']
-
         if player:
             new_data, columns = similar_player_table.get_similar_players(player)
-            
-        return new_data, columns
+            similar_players = similar_player_table.get_5_similar_players_df()
+            new_heatmap = heatmap_plot.update(player, similar_players)
+        return new_data, columns, new_heatmap
     
     # update the radar plot based on click and hover data
     @app.callback(
@@ -194,24 +195,4 @@ if __name__ == '__main__':
         else: clickedPlayer = None
         return info_card1.update(clickedPlayer)
     
-    @app.callback(
-        Output(heatmap_plot.html_id, 'figure'),
-        Input(scatter_plot.html_id, 'selectedData'),
-        Input(attribute_dropdown.html_id, 'value')
-    )
-    def update_heatmap_players(selected_player, selected_attribute):
-        """
-        Get stats dropdown value, selected attributes, selected players
-        return updates heatmap
-        """
-        if selected_player: 
-            player_names = [player['customdata'][0] for player in selected_player['points']]
-        else: player_names = []
-
-        #The heatmap is broken atm because of the changes. Remove the try catch when functional
-        try:
-            return heatmap_plot.update(player_names, selected_attribute)
-        except:
-            return None
-
     app.run_server(debug=True, dev_tools_ui=True)

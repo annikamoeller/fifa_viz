@@ -18,45 +18,24 @@ class Heatmap(html.Div):
             className="graph_card",
             children=
                 dcc.Graph(id=self.html_id),
-            style={'margin': 'auto', 'width': '70%','text-align': 'center', 'padding': 20}
+            style={'margin': 'auto', 'width': '90%','text-align': 'center', 'padding': 10}
         )
     
-
-    def update(self, player_names=None, selected_attribute=None, selected_stat=None):
+    def update(self, selected_player, similar_players_df):
         """ 
-        @selected_player List(str): Names of selected players.
-        @selected_attribute List(str): Attributes selected form dropdown.
+        @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
-
-        df = main_df
-
-        # if selected_stat == 'Goalkeeper': df = goalkeeping_radar_df
-        # if selected_stat == 'Defender': df = defense_radar_df
-        # if selected_stat == 'Midfilder': df = midfielder_radar_df
-        # if selected_stat == 'Striker': df = striker_radar_df
-
-        # fig = go.Figure()
-        # fig.add_trace(go.Heatmap(
-        #     z=[[1, 20, 30],
-        #        [20, 1, 60],
-        #        [30, 60, 1]]))
-        
-        df_test = df.loc[player_names, selected_attribute]
-
-        # fig = go.Figure()
-        # fig.add_trace(go.Heatmap(
-        #     z=df_test.values,
-        #     x=df_test.columns.tolist(),
-        #     y=df_test.index,
-        #     colorscale='Viridis'))
-
-        fig = go.Figure()
+        # Create the plot layout
+        plot_layout = go.Layout(
+            title=f'5 most similar players to {selected_player}',  # Title for the graph
+        )
+        fig = go.Figure(layout=plot_layout)
         fig.add_trace(go.Heatmap(
-            z=df_test,
-            x=df_test.columns.tolist(),
-            y=df_test.index,
+            z=similar_players_df,
+            x=similar_players_df.columns,
+            y=similar_players_df.index,
             colorscale='Viridis'))
-
+        
         #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
@@ -75,8 +54,4 @@ class Heatmap(html.Div):
                 gridcolor='#9D9D9D',
                 title_font=dict(size=17, color='#9D9D9D'),
             ))
-            
-        # #Set the color scheme for the plot
-        # fig = self.set_fig_style(fig)
-
         return fig

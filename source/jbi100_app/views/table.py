@@ -66,21 +66,6 @@ class Table(html.Div):
                                     ),
                 style={'margin': 'auto', 'width': '90%', 'padding': 10}
             )
-
-        # Equivalent to `html.Div([...])`
-        super().__init__(
-            className="graph_card",
-            children=
-                dash_table.DataTable(
-                                id=self.html_id,
-                                columns=[],
-                                style_table={'height': '500px', 'overflowY': 'scroll'},
-                                style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
-                                #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
-                                style_data={'color': 'black'}
-                                ),
-            style={'margin': 'auto', 'width': '100%', 'padding': 10}
-            )
     
     def update(self, selected_stat, team_filter=None, position_filter=None):
         """
@@ -107,6 +92,9 @@ class Table(html.Div):
     def set_click_player(self, clickedPlayer):
         self.clickPlayer = clickedPlayer
 
+    def get_5_similar_players_df(self):
+        return self.similar_players_df
+
     def get_similar_players(self, player, num_similar_players=5):
         """
         @player (str): the player for which we want similar players
@@ -128,10 +116,9 @@ class Table(html.Div):
 
         result = np.array(result)
         result = result.round(8)
-
-        x = np.argsort(result[0])[::-1][:num_similar_players]
-      
+        x = np.argsort(result[0])[::-1][1:num_similar_players+1]
         similar_player_df = df.iloc[x]
+        self.similar_players_df = similar_player_df
         similar_player_df = similar_player_df.reset_index()
 
         similar_player_data = similar_player_df.to_dict('records')
