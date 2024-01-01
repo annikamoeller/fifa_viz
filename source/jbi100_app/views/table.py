@@ -55,16 +55,16 @@ class Table(html.Div):
             # Just an empty table for now.
             super().__init__(
                 className="graph_card",
-                children=
+                children=[
                     dash_table.DataTable(
                                     id=self.html_id,
                                     columns=[],
-                                    style_table={'height': '300px', 'overflowY': 'scroll'},
+                                    style_table={'overflowY': 'scroll'},
                                     style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
                                     #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
                                     style_data={'color': 'black'}
-                                    ),
-                style={'margin': 'auto', 'width': '90%', 'padding': 10}
+                                    )],
+                style={'margin': 'auto', 'width': '80%', 'padding': 10}
             )
     
     def update(self, selected_stat, team_filter=None, position_filter=None):

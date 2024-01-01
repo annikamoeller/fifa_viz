@@ -14,7 +14,6 @@ from jbi100_app.views.multival_dropdown import *
 from dash import html
 from dash.dependencies import Input, Output
 
-
 if __name__ == '__main__':
 
     """ 
@@ -57,12 +56,10 @@ if __name__ == '__main__':
 
     # Heatmap plot
     heatmap_plot = Heatmap("heatmap_plot", main_df)
-    # stat dropdown for heatmap 
-    attribute_dropdown = MultiValDropdown("attribute_dropdown", ['A', 'B', 'C'], None, 'Attributes')
 
     # Set up page on left and right
-    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, radar_and_info]
-    right_menu_plots = [scatter_dropdowns, scatter_plot, similar_player_table, heatmap_plot]
+    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
+    right_menu_plots = [radar_plot, info_card1, similar_player_table, heatmap_plot]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -141,6 +138,36 @@ if __name__ == '__main__':
     def update_table(selected_stat, team, position):
         new_data, new_cols = player_data_table.update(selected_stat, team, position)
         return new_data, new_cols
+    
+    style_data_conditional = [
+    {
+        "if": {"state": "active"},
+        "backgroundColor": "rgb(204, 230, 255)",
+        "border": "1px green",
+    },
+    {
+        "if": {"state": "selected"},
+        "backgroundColor": "rgb(204, 230, 255)",
+        "border": "1px green",
+    },
+]
+    
+    # Callback to update the style of the selected row
+    @app.callback(
+        Output(player_data_table.html_id, 'style_data_conditional'),
+        Input(player_data_table.html_id, 'active_cell')
+    )
+    def update_selected_row_color(active):
+        style = style_data_conditional.copy()
+        if active:
+            style.append(
+                {
+                    "if": {"row_index": active["row"]},
+                    "backgroundColor": "rgb(204, 230, 255)",
+                    "border": "1px green",
+                },
+            )
+        return style
          
     #update the similar player table and heatmap
     @app.callback(

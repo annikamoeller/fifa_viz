@@ -26,10 +26,8 @@ class Heatmap(html.Div):
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
         # Create the plot layout
-        plot_layout = go.Layout(
-            title=f'5 most similar players to {selected_player}',  # Title for the graph
-        )
-        fig = go.Figure(layout=plot_layout)
+
+        fig = go.Figure()
         fig.add_trace(go.Heatmap(
             z=similar_players_df,
             x=similar_players_df.columns,

@@ -19,11 +19,10 @@ class InfoCard(html.Div):
                 dcc.Textarea(
                 id = self.html_id,
                 placeholder = 'No player selected',
-                value = None,
-                style={'width': '60%', 'height': 120, 'padding': 10},
-                )
-            ]
-        )
+                value = "",
+                style={'width': '50%', 'justifyContent': 'center', 'height': 120, 'padding': 10}
+        )],     style=dict(display='flex', justifyContent='center')
+)
 
     def update(self, player_name):
         if player_name:
