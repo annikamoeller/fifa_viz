@@ -3,9 +3,10 @@ import plotly.graph_objects as go
 from ..config import *
 import plotly.express as px
 from ..common import *
+import numpy as np
 
 class Scatterplot(html.Div):
-    def __init__(self, name, df):
+    def __init__(self, name, df, x_axis_stat, y_axis_stat):
         """
         @name (str): used for the html_id
         @feature_x (str): x-axis value that matches df column
@@ -15,16 +16,18 @@ class Scatterplot(html.Div):
         self.html_id = name.lower().replace(" ", "-")
         self.clickPlayer = None
         self.df = df
-
+        df = main_df.reset_index()
+        self.initial_plot = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
+        
         # Equivalent to `html.Div([...])`
         super().__init__(
             className="graph_card",
             children=
-                dcc.Graph(id=self.html_id),
+                dcc.Graph(id=self.html_id, figure=self.update_layout(self.initial_plot)),
             style={'margin': 'auto', 'width': '100%', 'height': 400, 'padding': 10}
         )
 
-    def update(self, on, x_axis_stat, y_axis_stat, team_filter, position_filter):
+    def update(self, on, x_axis_stat, y_axis_stat, team_filter, position_filter, player):
         """
         @on (str): whether or not goalkeeper mode is on
         @x_axis_stat (str): statistic chosen for x-axis 
@@ -35,9 +38,12 @@ class Scatterplot(html.Div):
         """
         if on: df = gk_df.reset_index()
         else: df = main_df.reset_index()
-
+               
         df = filter_df(df, team_filter, position_filter)
         fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
+
+        if player:
+            self.highlight_player(fig, player)
 
         return self.update_layout(fig)
         
@@ -45,22 +51,67 @@ class Scatterplot(html.Div):
         #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
-            modebar_color = '#136d6d',
             title_font_color='white',
             legend_font_color='white',
             legend_title_font_color='white',
             xaxis = dict(
-            color="#9D9D9D",
-            tickfont_size=14,
-            title_font=dict(size=20, color='#9D9D9D')),
+                color="#9D9D9D",
+                title_font=dict(size=20, color='#9D9D9D')),
             yaxis=dict(
                 color="#9D9D9D",
                 titlefont_size=16,
-                tickfont_size=14,
                 gridcolor='#9D9D9D',
-                title_font=dict(size=17, color='#9D9D9D'),
+                title_font=dict(size=20, color='#9D9D9D'),
             ))
         return fig
+
+    def highlight_player(self, fig, player):
+        """
+        @fig (fig): plot figure to be updated
+        @player (str): player to be highlighted
+        """
+        traces = []
+        for item in fig.select_traces():
+            traces.append(item)
+
+        for trace in traces:
+            # Set default point styles.
+            n = len(trace.x)
+            color = [trace.marker.color] * n
+            opacity = [1] * n
+            size = [5] * n
+            #this gets a numpy array with the player idx
+            idx = np.where(trace.customdata == player)[0] 
+            
+            if idx.size != 0: #check if we found a player
+
+                idx = idx[0] #get the actual int
+
+                if idx == 0:
+                    #if the selected player is at idx 0, we have to switch it to a dif position
+                    #this is because pyplot sets the legend color based on the first idx of the trace
+                    #hence, changing the color of idx=0 also changes the label color
+                    x = trace.x
+                    y = trace.y
+                    player_name = trace.customdata
+
+                    x[0], x[1] = x[0], x[1]
+                    y[0], y[1] = y[0], y[1]
+
+                    selected = player_name[0]
+                    switch = player_name[1]
+                    player_name[1] = selected
+                    player_name[0] = switch
+
+                    idx = 1
+                    
+                color[idx] = "yellow"
+                size[idx] = 15
+                # Update trace.
+                trace.marker.color = color
+                trace.marker.size = size
+                trace.marker.line.color = color
+                trace.marker.opacity = opacity
 
     #Not needed or used for now
     def get_click_player(self):
@@ -69,3 +120,6 @@ class Scatterplot(html.Div):
     #Not needed or used for now
     def set_click_player(self, clickedPlayer):
         self.clickPlayer = clickedPlayer
+
+    def get_initial_plot(self):
+        return self.initial_plot

@@ -17,7 +17,7 @@ class Heatmap(html.Div):
         super().__init__(
             className="graph_card",
             children=
-                dcc.Graph(id=self.html_id),
+                dcc.Graph(id=self.html_id, figure=self.initial_heatmap()),
             style={'margin': 'auto', 'width': '90%','text-align': 'center', 'padding': 10}
         )
     
@@ -59,7 +59,31 @@ class Heatmap(html.Div):
             hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
             colorscale='Viridis'))
         
-        #Update the style and colors of the graph
+        return self.update_heatmap_layout(fig)
+    
+    def initial_heatmap(self):
+        """
+        Creates a basic heatmap with the top 5 values from main_df
+        @return (figure) created heatmap figure
+        """
+        first_five_values_df = normalized_main_df.head(5)
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Heatmap(
+            z=first_five_values_df,
+            x=first_five_values_df.columns,
+            y=first_five_values_df.index,
+            colorscale='Viridis'))
+        
+        return self.update_heatmap_layout(fig)
+    
+    def update_heatmap_layout(self, fig):
+        """
+        Updates a figures style
+        @fig (figure): a graph figure to be updated
+        @return (figure): updated figure
+        """
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
             modebar_color = '#136d6d',
@@ -83,5 +107,5 @@ class Heatmap(html.Div):
         
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=False)
-        
+
         return fig

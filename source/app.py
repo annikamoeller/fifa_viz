@@ -35,7 +35,7 @@ if __name__ == '__main__':
     table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
     # Scatter plot
-    scatter_plot = Scatterplot("scatterplot", main_df)
+    scatter_plot = Scatterplot("scatterplot", main_df, 'goals', 'goals')
     
     # drop downs for scatter plot 
     x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats, startingValue=player_stats[0], label='X-Axis Values')
@@ -121,13 +121,18 @@ if __name__ == '__main__':
         Input(x_axis_dropdown.html_id, "value"),
         Input(y_axis_dropdown.html_id, "value"),
         Input(filter_team_dropdown.html_id, 'value'),
-        Input(filter_position_dropdown.html_id, 'value')
+        Input(filter_position_dropdown.html_id, 'value'),
+        Input(player_data_table.html_id, 'data'),
+        Input(player_data_table.html_id, 'active_cell')
     )
-    def update_scatter(on, x_label, y_label, team_filter, position_filter):
+    def update_scatter(on, x_label, y_label, team_filter, position_filter, clicked_table_player_data, clicked_cell):
         """
         Return a figure with a teams plot based on team dropdown value 
         """
-        return scatter_plot.update(on, x_label, y_label, team_filter, position_filter)
+        player = None
+        if clicked_table_player_data and clicked_cell:
+            player = clicked_table_player_data[clicked_cell['row']]['player']
+        return scatter_plot.update(on, x_label, y_label, team_filter, position_filter, player)
     
     # update the table based on the drop downs
     @app.callback(
@@ -141,25 +146,26 @@ if __name__ == '__main__':
         new_data, new_cols = player_data_table.update(selected_stat, team, position)
         return new_data, new_cols
     
-    style_data_conditional = [
-    {
-        "if": {"state": "active"},
-        "backgroundColor": "rgb(204, 230, 255)",
-        "border": "1px green",
-    },
-    {
-        "if": {"state": "selected"},
-        "backgroundColor": "rgb(204, 230, 255)",
-        "border": "1px green",
-    },
-]
-    
     # Callback to update the style of the selected row
     @app.callback(
         Output(player_data_table.html_id, 'style_data_conditional'),
         Input(player_data_table.html_id, 'active_cell')
     )
     def update_selected_row_color(active):
+
+        style_data_conditional = [
+            {
+                "if": {"state": "active"},
+                "backgroundColor": "rgb(204, 230, 255)",
+                "border": "1px green",
+            },
+            {
+                "if": {"state": "selected"},
+                "backgroundColor": "rgb(204, 230, 255)",
+                "border": "1px green",
+            },
+        ]
+
         style = style_data_conditional.copy()
         if active:
             style.append(
@@ -184,42 +190,63 @@ if __name__ == '__main__':
     )
     def update_similar_players(data, clicked_cell, columns, local_normalization, selected_players):
         # Function partly broken, only updates heatmap when no players are selected in the scatterplot.
-        player = data[clicked_cell['row']]['player']
+        player = None
+        if data and clicked_cell:
+            player = data[clicked_cell['row']]['player']
+
         if selected_players:
             print('Players Selected')
             players = [player['customdata'][0] for player in selected_players['points']]
             new_heatmap = heatmap_plot.update(players, None, local_normalization)
+
+        new_data = []
+        columns = []
+        new_heatmap = heatmap_plot.initial_heatmap()
+
         if player:
             print('No Players Selected')
             new_data, columns = similar_player_table.get_similar_players(player)
             similar_players = similar_player_table.get_5_similar_players_df()
             new_heatmap = heatmap_plot.update(None, similar_players, local_normalization)
+
         return new_data, columns, new_heatmap
     
     # update the radar plot based on click and hover data
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'clickData'),
-    Input(scatter_plot.html_id, 'hoverData')
+    Input(scatter_plot.html_id, 'hoverData'),
+    Input(player_data_table.html_id, 'data'),
+    Input(player_data_table.html_id, 'active_cell')
     )
-    def selected_player(click, hover):
+    def selected_player(click, hover, table_data, clicked_cell):
         """
         Get clicked, hovered player and stats dropdown value 
         return a radar figure with the stats of the selected players and dropdown
         """
+        table_selected_player = None
+        if table_data and clicked_cell:
+            table_selected_player = table_data[clicked_cell['row']]['player']
+
         newPlayerClicked = False
         if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
         else: clickedPlayer = None
 
         #Keeping track of the clicked and previously clicked player. May be needed in the future
         if clickedPlayer != scatter_plot.get_click_player():
-                previouslyClickedPlayer = scatter_plot.get_click_player()
-                scatter_plot.set_click_player(clickedPlayer) 
-                newPlayerClicked = True
+            previouslyClickedPlayer = scatter_plot.get_click_player()
+            scatter_plot.set_click_player(clickedPlayer) 
+            newPlayerClicked = True
+
+        if table_selected_player:
+            scatter_plot.set_click_player(clickedPlayer) 
 
         if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
         else: hoveredPlayer = None
-        
+
+        if table_selected_player != clickedPlayer:
+            clickedPlayer = table_selected_player
+
         return radar_plot.update(clickedPlayer, hoveredPlayer)
 
     # update info card to display basic player info when clicked on in scatter plot 
