@@ -40,7 +40,8 @@ class Scatterplot(html.Div):
         else: df = main_df.reset_index()
                
         df = filter_df(df, team_filter, position_filter)
-        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, size=df_player_stats['minutes_90s'], hover_data='player', color='position')
+        df_sizes = filter_df(df_player_stats, team_filter, position_filter)
+        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, size=df_sizes['minutes_90s'], hover_data='player', color='position')
 
         if player:
             self.highlight_player(fig, player)
