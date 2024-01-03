@@ -21,17 +21,42 @@ class Heatmap(html.Div):
             style={'margin': 'auto', 'width': '90%','text-align': 'center', 'padding': 10}
         )
     
-    def update(self, selected_player, similar_players_df):
+    def normalize_using_max(self, column):
+        max_val = column.max()
+        normalized_column = column / max_val
+        return normalized_column
+
+    def update(self, selected_player, similar_players_df, local_normalization):
         """ 
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
         # Create the plot layout
+        #Local Normalization / Global Normalization
+        # if selected_player:
+        #     selected_player_df = main_df.drop(columns=['team', 'position', 'birth_year'])
+        #     selected_player_df = selected_player_df.loc[selected_player]
+        #     if local_normalization:
+        #         normalized_df = selected_player_df.apply(normalize_using_max)
+        #     else:
+        #         normalized_df = normalized_main_df.loc[selected_player]
+        # elif not similar_player_df.empty:
+        if local_normalization:
+            normalized_df = similar_players_df.apply(self.normalize_using_max).drop(columns=['position'])
+        else:
+            normalized_df = normalized_main_df.loc[similar_players_df.index]
+        
+        # if selected_player: print('a')
+        # if not similar_players_df.empty: print('b')
+        # if local_normalization: print('c')
 
         fig = go.Figure()
         fig.add_trace(go.Heatmap(
-            z=similar_players_df,
-            x=similar_players_df.columns,
-            y=similar_players_df.index,
+            name="",
+            customdata=similar_players_df,
+            z=normalized_df,
+            x=normalized_df.columns,
+            y=normalized_df.index,
+            hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
             colorscale='Viridis'))
         
         #Update the style and colors of the graph
@@ -50,6 +75,13 @@ class Heatmap(html.Div):
                 titlefont_size=16,
                 tickfont_size=14,
                 gridcolor='#9D9D9D',
-                title_font=dict(size=17, color='#9D9D9D'),
-            ))
+                title_font=dict(size=17, color='#9D9D9D')
+            ),
+            xaxis_title="Attributes",
+            yaxis_title="Players"
+            )
+        
+        fig.update_xaxes(showgrid=False)
+        fig.update_yaxes(showgrid=False)
+        
         return fig

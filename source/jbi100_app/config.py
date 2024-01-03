@@ -1,5 +1,6 @@
 # Here you can add any global configuations
 import pandas as pd
+from jbi100_app.views.normalize_df import *
 
 """Never use these global dataframes directly
 If you want to modify them make a new dataframe 
@@ -76,5 +77,8 @@ gk_df = gk_df.set_index('player')
 # basic player info df for info card
 df_player_basic = df_player_misc[['birth_year', 'team', 'position']]
 
-
+# Globally Normalized Data
+# normalized_main_df = main_df.drop(["team"])#.apply(normalize_df)
+normalized_main_df = main_df.drop(columns=['team', 'position', 'birth_year'])
+normalized_main_df = normalized_main_df.apply(normalize_df)
 

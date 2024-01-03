@@ -9,6 +9,7 @@ from jbi100_app.views.switch import *
 from jbi100_app.views.heatmap import *
 from jbi100_app.views.infoCard import *
 from jbi100_app.views.table import *
+from jbi100_app.views.normalization_switch import *
 
 from jbi100_app.views.multival_dropdown import *
 from dash import html
@@ -55,11 +56,12 @@ if __name__ == '__main__':
     radar_and_info = html.Div([radar_plot, info_card1], style={'display': 'flex', 'flexDirection': 'row'})
 
     # Heatmap plot
+    normalization_switch = NormalizationSwitch('normalization_switch')
     heatmap_plot = Heatmap("heatmap_plot", main_df)
 
     # Set up page on left and right
     left_menu_plots = [gk_switch, table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_card1, similar_player_table, heatmap_plot]
+    right_menu_plots = [radar_plot, info_card1, similar_player_table, normalization_switch, heatmap_plot]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -176,14 +178,22 @@ if __name__ == '__main__':
             Output(heatmap_plot.html_id, 'figure'),
             Input(player_data_table.html_id, 'data'),
             Input(player_data_table.html_id, 'active_cell'),
-            Input(player_data_table.html_id, 'columns')
+            Input(player_data_table.html_id, 'columns'),
+            Input(normalization_switch.html_id, 'on'),
+            Input(scatter_plot.html_id, 'selectedData')
     )
-    def update_similar_players(data, clicked_cell, columns):
+    def update_similar_players(data, clicked_cell, columns, local_normalization, selected_players):
+        # Function partly broken, only updates heatmap when no players are selected in the scatterplot.
         player = data[clicked_cell['row']]['player']
+        if selected_players:
+            print('Players Selected')
+            players = [player['customdata'][0] for player in selected_players['points']]
+            new_heatmap = heatmap_plot.update(players, None, local_normalization)
         if player:
+            print('No Players Selected')
             new_data, columns = similar_player_table.get_similar_players(player)
             similar_players = similar_player_table.get_5_similar_players_df()
-            new_heatmap = heatmap_plot.update(player, similar_players)
+            new_heatmap = heatmap_plot.update(None, similar_players, local_normalization)
         return new_data, columns, new_heatmap
     
     # update the radar plot based on click and hover data
