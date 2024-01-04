@@ -223,9 +223,10 @@ if __name__ == '__main__':
             Input(player_data_table.html_id, 'active_cell'),
             Input(player_data_table.html_id, 'columns'),
             Input(normalization_switch.html_id, 'on'),
-            Input('highlighted-player-value', 'data')
+            Input('highlighted-player-value', 'data'),
+            Input(scatter_plot.html_id, 'selectedData')
     )
-    def update_similar_players(data, clicked_cell, columns, local_normalization, highlight_player_data):
+    def update_similar_players(data, clicked_cell, columns, local_normalization, highlight_player_data, selected_players_in_scatter_plot):
         # Function partly broken, only updates heatmap when no players are selected in the scatterplot.
         player = json.loads(highlight_player_data)
 
@@ -242,6 +243,15 @@ if __name__ == '__main__':
             new_data, columns = similar_player_table.get_similar_players(player)
             similar_players = similar_player_table.get_5_similar_players_df()
             new_heatmap = heatmap_plot.update(None, similar_players, local_normalization)
+        
+        try:
+            selected_names_in_scatter_plot = [player['customdata'][0] for player in selected_players_in_scatter_plot['points']]
+            if not selected_names_in_scatter_plot:
+                pass
+            else:
+                new_heatmap = heatmap_plot.update(selected_names_in_scatter_plot, None, local_normalization)
+        except: 
+            pass
 
         return new_data, columns, new_heatmap
     

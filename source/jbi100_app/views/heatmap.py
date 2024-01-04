@@ -31,31 +31,36 @@ class Heatmap(html.Div):
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
         # Create the plot layout
-        #Local Normalization / Global Normalization
-        # if selected_player:
-        #     selected_player_df = main_df.drop(columns=['team', 'position', 'birth_year'])
-        #     selected_player_df = selected_player_df.loc[selected_player]
-        #     if local_normalization:
-        #         normalized_df = selected_player_df.apply(normalize_using_max)
-        #     else:
-        #         normalized_df = normalized_main_df.loc[selected_player]
-        # elif not similar_player_df.empty:
-        if local_normalization:
-            normalized_df = similar_players_df.apply(self.normalize_using_max).drop(columns=['position'])
-        else:
-            normalized_df = normalized_main_df.loc[similar_players_df.index]
-        
-        # if selected_player: print('a')
-        # if not similar_players_df.empty: print('b')
-        # if local_normalization: print('c')
+        # Next step is to create two routes, depending on wheter 1st/2nd input == None. [done]
+        # i.e., the heatmap for 5 similiar players or the scatterplot selection. [done]
+        # Next step is to make sure that the hover tempplate is correct for each of the 4 scenarios.
+
+        if not selected_player: # If 5 similar players are given, and no selection is made in the scatter plot.
+            if local_normalization:
+                normalized_df = similar_players_df.apply(self.normalize_using_max).drop(columns=['position'])
+            else:
+                normalized_df = normalized_main_df.loc[similar_players_df.index]
+            customdata_input = similar_players_df
+        else: # If a player selection is made in the scatter plot.
+            if local_normalization:
+                normalized_df = normalized_main_df.loc[selected_player].apply(self.normalize_using_max)
+            else:
+                normalized_df = normalized_main_df.loc[selected_player]
+            customdata_input = main_df.drop(columns=['team', 'position', 'birth_year']).loc[selected_player]
+
+        if len(normalized_df) > 9: 
+            y_axis = []
+        else: 
+            y_axis = normalized_df.index
+
 
         fig = go.Figure()
         fig.add_trace(go.Heatmap(
             name="",
-            customdata=similar_players_df,
+            customdata=customdata_input,
             z=normalized_df,
             x=normalized_df.columns,
-            y=normalized_df.index,
+            y=y_axis,
             hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
             colorscale='Viridis'))
         
