@@ -19,6 +19,7 @@ class Table(html.Div):
         """
 
         self.html_id = name.lower().replace(" ", "-")
+        self.clicked_cell = None
 
         if df is not None:
             df = df.reset_index()
@@ -28,7 +29,7 @@ class Table(html.Div):
             df = df[['rank', 'player', 'team', selected_stat, 'position']]
             df = df.sort_values(by=selected_stat, ascending=False)
 
-            self.clickPlayer = None
+            
 
             # Main table
             super().__init__(
@@ -84,14 +85,6 @@ class Table(html.Div):
         
         return data, columns
 
-    #Not needed or used for now
-    def get_click_player(self):
-        return self.clickPlayer
-    
-    #Not needed or used for now
-    def set_click_player(self, clickedPlayer):
-        self.clickPlayer = clickedPlayer
-
     def get_5_similar_players_df(self):
         return self.similar_players_df
 
@@ -125,3 +118,9 @@ class Table(html.Div):
         columns=[{'name': col, 'id': col} for col in similar_player_df.columns]
 
         return similar_player_data, columns
+    
+    def set_clicked_cell(self, clicked_cell):
+        self.clicked_cell = clicked_cell
+
+    def get_clicked_cell(self):
+        return self.clicked_cell

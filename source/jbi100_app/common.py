@@ -15,3 +15,10 @@ def rank_df(df, selected_stat):
     df = df[['rank', 'player', 'team', selected_stat, 'position']]
     df = df.sort_values(by=selected_stat, ascending=False)
     return df
+
+def normalize_df(column):
+    """Takes column from pandas dataframe, returns the normalized column 
+    so that the values lie in [0, 1]."""
+    max_val = column.max()
+    normalized_column = column / max_val
+    return normalized_column

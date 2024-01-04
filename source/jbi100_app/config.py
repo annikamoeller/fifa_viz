@@ -1,6 +1,6 @@
 # Here you can add any global configuations
 import pandas as pd
-from jbi100_app.views.normalize_df import *
+from jbi100_app.common import *
 
 """Never use these global dataframes directly
 If you want to modify them make a new dataframe 

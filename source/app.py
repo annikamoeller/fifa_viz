@@ -14,6 +14,7 @@ from jbi100_app.views.normalization_switch import *
 from jbi100_app.views.multival_dropdown import *
 from dash import html
 from dash.dependencies import Input, Output
+import json
 
 if __name__ == '__main__':
 
@@ -59,9 +60,14 @@ if __name__ == '__main__':
     normalization_switch = NormalizationSwitch('normalization_switch')
     heatmap_plot = Heatmap("heatmap_plot", main_df)
 
+    #this variable is used for many callbacks and it represents the highlighted player
+    #when saving data in it, it must be serialized by using json.dumps(data)
+    #when reading, we must decode by using json.loads(data)
+    store = dcc.Store(id='highlighted-player-value')
+
     # Set up page on left and right
     left_menu_plots = [gk_switch, table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_card1, similar_player_table, normalization_switch, heatmap_plot]
+    right_menu_plots = [radar_plot, info_card1, similar_player_table, normalization_switch, heatmap_plot, store]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -117,7 +123,9 @@ if __name__ == '__main__':
     # update the scatter plot based on the x and y drop downs
     @app.callback(
         Output(scatter_plot.html_id, 'figure'),
+        Output('highlighted-player-value', 'data'),
         Input(gk_switch.html_id, 'on'),
+        Input(scatter_plot.html_id, 'clickData'),
         Input(x_axis_dropdown.html_id, "value"),
         Input(y_axis_dropdown.html_id, "value"),
         Input(filter_team_dropdown.html_id, 'value'),
@@ -125,14 +133,43 @@ if __name__ == '__main__':
         Input(player_data_table.html_id, 'data'),
         Input(player_data_table.html_id, 'active_cell')
     )
-    def update_scatter(on, x_label, y_label, team_filter, position_filter, clicked_table_player_data, clicked_cell):
+    def update_scatter(on, click, x_label, y_label, team_filter, position_filter, clicked_table_player_data, clicked_cell):
         """
         Return a figure with a teams plot based on team dropdown value 
         """
         player = None
-        if clicked_table_player_data and clicked_cell:
-            player = clicked_table_player_data[clicked_cell['row']]['player']
-        return scatter_plot.update(on, x_label, y_label, team_filter, position_filter, player)
+
+        #get the last clicked scatter and table clicked player 
+        if clicked_table_player_data and clicked_cell: 
+            table_player = clicked_table_player_data[clicked_cell['row']]['player']
+        else: table_player = None
+        
+        if click: scatter_player = click['points'][0]['customdata'][0] #get click data
+        else: scatter_player = None
+
+        #get the previously clicked players
+        prev_table_click, prev_scatter_click = scatter_plot.get_click_player()
+
+        #if the players are not the same and a new value is clicked, set it
+        if table_player != scatter_player:
+
+            if prev_table_click != table_player: player = table_player
+            elif prev_scatter_click != scatter_player: player = scatter_player
+
+            #if we change labels or filters we persist the table click value,
+            #otherwise, we set the clicked players in scatter_plot
+            if x_label != scatter_plot.x_axis_stat \
+                                or y_label != scatter_plot.y_axis_stat  \
+                                or team_filter != scatter_plot.team_filter \
+                                or position_filter != scatter_plot.position_filter:
+                player = table_player
+                scatter_plot.set_click_player(table_player, None)
+
+            else: scatter_plot.set_click_player(table_player, scatter_player)
+
+        else: player = scatter_player
+
+        return scatter_plot.update(on, x_label, y_label, team_filter, position_filter, player), json.dumps(player)
     
     # update the table based on the drop downs
     @app.callback(
@@ -186,25 +223,22 @@ if __name__ == '__main__':
             Input(player_data_table.html_id, 'active_cell'),
             Input(player_data_table.html_id, 'columns'),
             Input(normalization_switch.html_id, 'on'),
-            Input(scatter_plot.html_id, 'selectedData')
+            Input('highlighted-player-value', 'data')
     )
-    def update_similar_players(data, clicked_cell, columns, local_normalization, selected_players):
+    def update_similar_players(data, clicked_cell, columns, local_normalization, highlight_player_data):
         # Function partly broken, only updates heatmap when no players are selected in the scatterplot.
-        player = None
-        if data and clicked_cell:
-            player = data[clicked_cell['row']]['player']
+        player = json.loads(highlight_player_data)
 
-        if selected_players:
-            print('Players Selected')
-            players = [player['customdata'][0] for player in selected_players['points']]
-            new_heatmap = heatmap_plot.update(players, None, local_normalization)
+        # if selected_players:
+        #     print('Players Selected')
+        #     players = [player['customdata'][0] for player in selected_players['points']]
+        #     new_heatmap = heatmap_plot.update(players, None, local_normalization)
 
         new_data = []
         columns = []
         new_heatmap = heatmap_plot.initial_heatmap()
 
         if player:
-            print('No Players Selected')
             new_data, columns = similar_player_table.get_similar_players(player)
             similar_players = similar_player_table.get_5_similar_players_df()
             new_heatmap = heatmap_plot.update(None, similar_players, local_normalization)
@@ -214,49 +248,30 @@ if __name__ == '__main__':
     # update the radar plot based on click and hover data
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
-    Input(scatter_plot.html_id, 'clickData'),
     Input(scatter_plot.html_id, 'hoverData'),
-    Input(player_data_table.html_id, 'data'),
-    Input(player_data_table.html_id, 'active_cell')
+    Input('highlighted-player-value', 'data')
     )
-    def selected_player(click, hover, table_data, clicked_cell):
+    def selected_player(hover, highlight_player_data):
         """
         Get clicked, hovered player and stats dropdown value 
         return a radar figure with the stats of the selected players and dropdown
         """
-        table_selected_player = None
-        if table_data and clicked_cell:
-            table_selected_player = table_data[clicked_cell['row']]['player']
-
-        newPlayerClicked = False
-        if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
-        else: clickedPlayer = None
-
-        #Keeping track of the clicked and previously clicked player. May be needed in the future
-        if clickedPlayer != scatter_plot.get_click_player():
-            previouslyClickedPlayer = scatter_plot.get_click_player()
-            scatter_plot.set_click_player(clickedPlayer) 
-            newPlayerClicked = True
-
-        if table_selected_player:
-            scatter_plot.set_click_player(clickedPlayer) 
+        highlight_player_data = json.loads(highlight_player_data)
 
         if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
         else: hoveredPlayer = None
 
-        if table_selected_player != clickedPlayer:
-            clickedPlayer = table_selected_player
-
-        return radar_plot.update(clickedPlayer, hoveredPlayer)
+        return radar_plot.update(highlight_player_data, hoveredPlayer)
 
     # update info card to display basic player info when clicked on in scatter plot 
     @app.callback(
         Output(info_card1.html_id, 'value'),
-        Input(scatter_plot.html_id, 'clickData')
+        Input('highlighted-player-value', 'data')
     )
-    def info_card(click):
-        if click: clickedPlayer = click['points'][0]['customdata'][0] #get click data
-        else: clickedPlayer = None
-        return info_card1.update(clickedPlayer)
+    def info_card(highlight_player_data):
+        highlight_player_data = json.loads(highlight_player_data)
+        if highlight_player_data:
+            return info_card1.update(highlight_player_data)
+        else: return "" #empty infocard
     
     app.run_server(debug=True, dev_tools_ui=True)

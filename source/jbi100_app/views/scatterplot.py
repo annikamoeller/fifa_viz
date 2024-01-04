@@ -14,8 +14,15 @@ class Scatterplot(html.Div):
         @df (df): main dataframe to be used
         """
         self.html_id = name.lower().replace(" ", "-")
-        self.clickPlayer = None
+        self.table_clicked = None
+        self.plot_clicked = None
+        self.highlighted_player = None
+        self.team_filter = None
+        self.position_filter = None
+        self.x_axis_stat = x_axis_stat
+        self.y_axis_stat = y_axis_stat
         self.df = df
+
         df = main_df.reset_index()
         self.initial_plot = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
         
@@ -38,6 +45,11 @@ class Scatterplot(html.Div):
         """
         if on: df = gk_df.reset_index()
         else: df = main_df.reset_index()
+
+        self.x_axis_stat = x_axis_stat
+        self.y_axis_stat = y_axis_stat
+        self.team_filter = team_filter
+        self.position_filter = position_filter
                
         df = filter_df(df, team_filter, position_filter)
         df_sizes = filter_df(df_player_stats, team_filter, position_filter)
@@ -85,7 +97,7 @@ class Scatterplot(html.Div):
             idx = np.where(trace.customdata == player)[0] 
             
             if idx.size != 0: #check if we found a player
-
+                
                 idx = idx[0] #get the actual int
 
                 if idx == 0:
@@ -105,7 +117,8 @@ class Scatterplot(html.Div):
                     player_name[0] = switch
 
                     idx = 1
-                    
+
+                self.highlighted_player = player
                 color[idx] = "yellow"
                 size[idx] = 15
                 # Update trace.
@@ -114,13 +127,15 @@ class Scatterplot(html.Div):
                 trace.marker.line.color = color
                 trace.marker.opacity = opacity
 
-    #Not needed or used for now
     def get_click_player(self):
-        return self.clickPlayer
+        return self.table_clicked, self.plot_clicked
     
-    #Not needed or used for now
-    def set_click_player(self, clickedPlayer):
-        self.clickPlayer = clickedPlayer
+    def set_click_player(self, table_clicked, plot_clicked):
+        self.table_clicked = table_clicked
+        self.plot_clicked = plot_clicked
+
+    def get_hilghlighted_player(self):
+        self.highlighted_player
 
     def get_initial_plot(self):
         return self.initial_plot
