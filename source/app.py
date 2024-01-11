@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     # Heatmap plot
     normalization_switch = NormalizationSwitch('normalization_switch')
-    heatmap_plot = Heatmap("heatmap_plot", main_df)
+    heatmap_plot = Heatmap("heatmap_plot", df_hm)
 
     #this variable is used for many callbacks and it represents the highlighted player
     #when saving data in it, it must be serialized by using json.dumps(data)
@@ -242,14 +242,15 @@ if __name__ == '__main__':
         if player:
             new_data, columns = similar_player_table.get_similar_players(player)
             similar_players = similar_player_table.get_5_similar_players_df()
-            new_heatmap = heatmap_plot.update(None, similar_players, local_normalization)
+            similar_player_names = similar_players.index.tolist()
+            new_heatmap = heatmap_plot.update(similar_player_names, local_normalization)
         
         try:
             selected_names_in_scatter_plot = [player['customdata'][0] for player in selected_players_in_scatter_plot['points']]
             if not selected_names_in_scatter_plot:
                 pass
             else:
-                new_heatmap = heatmap_plot.update(selected_names_in_scatter_plot, None, local_normalization)
+                new_heatmap = heatmap_plot.update(selected_names_in_scatter_plot, local_normalization)
         except: 
             pass
 

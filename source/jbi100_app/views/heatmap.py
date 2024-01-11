@@ -23,36 +23,21 @@ class Heatmap(html.Div):
     
     def normalize_using_max(self, column):
         max_val = column.max()
-        normalized_column = column / max_val
-        return normalized_column
+        if max_val > 0: return column / max_val
+        else: return column
 
-    def update(self, selected_player, similar_players_df, local_normalization):
+    def update(self, selected_player, local_normalization):
         """ 
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
-        # Create the plot layout
-        # Next step is to create two routes, depending on wheter 1st/2nd input == None. [done]
-        # i.e., the heatmap for 5 similiar players or the scatterplot selection. [done]
-        # Next step is to make sure that the hover tempplate is correct for each of the 4 scenarios.
 
-        if not selected_player: # If 5 similar players are given, and no selection is made in the scatter plot.
-            if local_normalization:
-                normalized_df = similar_players_df.apply(self.normalize_using_max).drop(columns=['position'])
-            else:
-                normalized_df = normalized_main_df.loc[similar_players_df.index]
-            customdata_input = similar_players_df
-        else: # If a player selection is made in the scatter plot.
-            if local_normalization:
-                normalized_df = normalized_main_df.loc[selected_player].apply(self.normalize_using_max)
-            else:
-                normalized_df = normalized_main_df.loc[selected_player]
-            customdata_input = main_df.drop(columns=['team', 'position', 'birth_year']).loc[selected_player]
+        if local_normalization:
+            normalized_df = df_hm.loc[selected_player].apply(self.normalize_using_max)
+        else:
+            normalized_df = df_hm_norm.loc[selected_player]
+        customdata_input = df_hm.loc[selected_player]
 
-        if len(normalized_df) > 9: 
-            y_axis = []
-        else: 
-            y_axis = normalized_df.index
-
+        show_y_ticks = len(normalized_df) <= 9 # if more player are selected than the y axis can fit, dont show names.
 
         fig = go.Figure()
         fig.add_trace(go.Heatmap(
@@ -60,18 +45,19 @@ class Heatmap(html.Div):
             customdata=customdata_input,
             z=normalized_df,
             x=normalized_df.columns,
-            y=y_axis,
+            y=normalized_df.index,
             hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
+            hoverongaps = False,
             colorscale='Viridis'))
         
-        return self.update_heatmap_layout(fig)
+        return self.update_heatmap_layout(fig, show_y_ticks)
     
     def initial_heatmap(self):
         """
         Creates a basic heatmap with the top 5 values from main_df
         @return (figure) created heatmap figure
         """
-        first_five_values_df = normalized_main_df.head(5)
+        first_five_values_df = df_hm_norm.head(5)
 
         fig = go.Figure()
 
@@ -81,9 +67,9 @@ class Heatmap(html.Div):
             y=first_five_values_df.index,
             colorscale='Viridis'))
         
-        return self.update_heatmap_layout(fig)
+        return self.update_heatmap_layout(fig, True)
     
-    def update_heatmap_layout(self, fig):
+    def update_heatmap_layout(self, fig, show_y_ticks):
         """
         Updates a figures style
         @fig (figure): a graph figure to be updated
@@ -104,7 +90,8 @@ class Heatmap(html.Div):
                 titlefont_size=16,
                 tickfont_size=14,
                 gridcolor='#9D9D9D',
-                title_font=dict(size=17, color='#9D9D9D')
+                title_font=dict(size=17, color='#9D9D9D'),
+                showticklabels=show_y_ticks
             ),
             xaxis_title="Attributes",
             yaxis_title="Players"

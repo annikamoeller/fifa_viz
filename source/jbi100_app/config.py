@@ -1,5 +1,6 @@
 # Here you can add any global configuations
 import pandas as pd
+import numpy as np
 from jbi100_app.common import *
 
 """Never use these global dataframes directly
@@ -82,3 +83,37 @@ df_player_basic = df_player_misc[['birth_year', 'team', 'position']]
 normalized_main_df = main_df.drop(columns=['team', 'position', 'birth_year'])
 normalized_main_df = normalized_main_df.apply(normalize_df)
 
+##### Prepare data for usage in Heatmap (and possibly other widgets)
+# Attacking DF
+df_attack = pd.DataFrame()
+# df_attack['Player'] = df_player_shooting.index
+# df_attack = df_attack.set_index('Player')
+df_attack['Shot Accuracy'] = df_player_shooting['shots_on_target'] / df_player_shooting['shots']
+df_attack['SCA per 90s'] = df_player_gca.set_index('player')['sca_per90']
+df_attack['GCA per 90s'] = df_player_gca.set_index('player')['gca_per90']
+df_attack['Goals per 90s'] = df_player_shooting['goals'] / df_player_shooting['minutes_90s']
+
+# Defensive DF
+df_defense = pd.DataFrame()
+# df_defense['Player'] = df_player_defense.index
+# df_defense = df_defense.set_index('Player')
+df_defense['Tackle Succes'] = df_player_defense['tackles_won'] / df_player_defense['tackles']
+df_defense['Blocks per 90s'] = df_player_defense['blocks'] / df_player_defense['minutes_90s']
+df_defense['Clearances per 90s'] = df_player_defense['clearances'] / df_player_defense['minutes_90s']
+df_defense['Severe Error'] = df_player_defense['errors'] / df_player_defense['minutes_90s']
+
+
+# Possesion
+df_possesion = pd.DataFrame()
+# df_possesion['Player'] = df_player_possession.index
+# df_possesion = df_possesion.set_index('Player')
+df_possesion['Touches per 90s'] = df_player_possession['touches'] / df_player_possession['minutes_90s']
+df_possesion['Dribble Succes'] = df_player_possession['dribbles_completed_pct']
+df_possesion['Miscontrol per 90s'] = df_player_possession['miscontrols'] / df_player_possession['minutes_90s']
+df_possesion['Dispossessed per 90s'] = df_player_possession['dispossessed'] / df_player_possession['minutes_90s']
+
+
+# Concatenate of dataframes
+df_hm = pd.concat([df_attack, df_defense, df_possesion], axis=1)
+df_hm.replace([np.inf, -np.inf], 0, inplace=True)
+df_hm_norm = df_hm.apply(normalize_df)
