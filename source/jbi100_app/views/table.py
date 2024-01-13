@@ -29,8 +29,6 @@ class Table(html.Div):
             df = df[['rank', 'player', 'team', selected_stat, 'position']]
             df = df.sort_values(by=selected_stat, ascending=False)
 
-            
-
             # Main table
             super().__init__(
                 className="graph_card",

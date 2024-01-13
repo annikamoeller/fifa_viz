@@ -22,7 +22,7 @@ class Scatterplot(html.Div):
         self.x_axis_stat = x_axis_stat
         self.y_axis_stat = y_axis_stat
         self.df = df
-
+        
         df = main_df.reset_index()
         self.initial_plot = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
         
@@ -34,7 +34,7 @@ class Scatterplot(html.Div):
             style={'margin': 'auto', 'width': '100%', 'height': 400, 'padding': 10}
         )
 
-    def update(self, on, x_axis_stat, y_axis_stat, team_filter, position_filter, player):
+    def update(self, on, x_axis_stat, y_axis_stat, selected_stat, team_filter, position_filter, player):
         """
         @on (str): whether or not goalkeeper mode is on
         @x_axis_stat (str): statistic chosen for x-axis 
@@ -48,6 +48,7 @@ class Scatterplot(html.Div):
 
         self.x_axis_stat = x_axis_stat
         self.y_axis_stat = y_axis_stat
+        self.selected_stat = selected_stat
         self.team_filter = team_filter
         self.position_filter = position_filter
                
@@ -138,3 +139,6 @@ class Scatterplot(html.Div):
 
     def get_initial_plot(self):
         return self.initial_plot
+    
+    def get_df(self):
+        return self.df

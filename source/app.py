@@ -130,20 +130,59 @@ if __name__ == '__main__':
     @app.callback(
         Output(scatter_plot.html_id, 'figure'),
         Output('highlighted-player-value', 'data'),
+        Output(player_data_table.html_id, 'style_data_conditional'),
+        Output(player_data_table.html_id, 'active_cell'),
         Input(gk_switch.html_id, 'on'),
         Input(scatter_plot.html_id, 'clickData'),
         Input(x_axis_dropdown.html_id, "value"),
         Input(y_axis_dropdown.html_id, "value"),
+        Input(table_stat_dropdown.html_id, 'value'),
         Input(filter_team_dropdown.html_id, 'value'),
         Input(filter_position_dropdown.html_id, 'value'),
         Input(player_data_table.html_id, 'data'),
         Input(player_data_table.html_id, 'active_cell')
-    )
-    def update_scatter(on, click, x_label, y_label, team_filter, position_filter, clicked_table_player_data, clicked_cell):
+                )
+    def update_scatter(on, click, x_label, y_label, selected_stat, team_filter, position_filter, clicked_table_player_data, clicked_cell):
         """
         Return a figure with a teams plot based on team dropdown value 
         """
         player = None
+        blue_highlight_style = [
+        {
+            
+            "if": {"state": "selected"},
+            "backgroundColor": "rgb(204, 230, 255)",
+            "line_color": "1px black",
+        },
+        {
+            "if": {"state": "active"},
+            "backgroundColor": "rgb(204, 230, 255)",
+            "line_color": "1px black"
+        }
+        ]
+
+        white_highlight_style = [
+        {
+            "if": {"state": "selected"},
+            "backgroundColor": "white",
+            "line_color": "1px black"
+        },
+        {
+            "if": {"state": "active"},
+            "backgroundColor": "white",
+            "line_color": "1px black"
+        }
+        ]
+
+        style = blue_highlight_style.copy()
+        if clicked_cell: 
+            style.append(
+                {
+                    "if": {"row_index": clicked_cell["row"]},
+                    "backgroundColor": "rgb(204, 230, 255)",
+                    "line_color": "1px black"
+                },
+            )
 
         #get the last clicked scatter and table clicked player 
         if clicked_table_player_data and clicked_cell: 
@@ -152,30 +191,45 @@ if __name__ == '__main__':
         
         if click: scatter_player = click['points'][0]['customdata'][0] #get click data
         else: scatter_player = None
-
         #get the previously clicked players
         prev_table_click, prev_scatter_click = scatter_plot.get_click_player()
-
         #if the players are not the same and a new value is clicked, set it
         if table_player != scatter_player:
-
             if prev_table_click != table_player: player = table_player
-            elif prev_scatter_click != scatter_player: player = scatter_player
 
+            elif prev_scatter_click != scatter_player: 
+                player = scatter_player
+                style = white_highlight_style.copy()
+                style.append(
+                    {
+                        "if": {"row_index": clicked_cell["row"]},
+                        "backgroundColor": "white",
+                        "line_color": "1px black"
+                    },
+                )
             #if we change labels or filters we persist the table click value,
             #otherwise, we set the clicked players in scatter_plot
             if x_label != scatter_plot.x_axis_stat \
                                 or y_label != scatter_plot.y_axis_stat  \
                                 or team_filter != scatter_plot.team_filter \
                                 or position_filter != scatter_plot.position_filter:
-                player = table_player
-                scatter_plot.set_click_player(table_player, None)
 
-            else: scatter_plot.set_click_player(table_player, scatter_player)
-
-        else: player = scatter_player
-
-        return scatter_plot.update(on, x_label, y_label, team_filter, position_filter, player), json.dumps(player)
+                    player = table_player
+                    scatter_plot.set_click_player(table_player, None)
+                    style = white_highlight_style.copy()
+                    style.append(
+                        {
+                            "if": {"row_index": clicked_cell["row"]},
+                            "backgroundColor": "white",
+                            "line_color": "1px black"
+                        },
+                    )
+    
+            else: 
+                scatter_plot.set_click_player(table_player, scatter_player)
+        else: 
+            player = scatter_player
+        return scatter_plot.update(on, x_label, y_label, selected_stat, team_filter, position_filter, player), json.dumps(player), style, clicked_cell
     
     # update the table based on the drop downs
     @app.callback(
@@ -191,35 +245,36 @@ if __name__ == '__main__':
         return new_data, new_cols
     
     # Callback to update the style of the selected row
-    @app.callback(
-        Output(player_data_table.html_id, 'style_data_conditional'),
-        Input(player_data_table.html_id, 'active_cell')
-    )
-    def update_selected_row_color(active):
+    # @app.callback(
+    #     Output(player_data_table.html_id, 'style_data_conditional'),
+    #     Input(player_data_table.html_id, 'active_cell'),
+    #     Input('highlighted-player-value', 'data')
+    # )
+    # def update_selected_row_color(active, highlight_player):
 
-        style_data_conditional = [
-            {
-                "if": {"state": "active"},
-                "backgroundColor": "rgb(204, 230, 255)",
-                "border": "1px green",
-            },
-            {
-                "if": {"state": "selected"},
-                "backgroundColor": "rgb(204, 230, 255)",
-                "border": "1px green",
-            },
-        ]
+    #     style_data_conditional = [
+    #         {
+    #             "if": {"state": "active"},
+    #             "backgroundColor": "rgb(204, 230, 255)",
+    #             "border": "1px green",
+    #         },
+    #         {
+    #             "if": {"state": "selected"},
+    #             "backgroundColor": "rgb(204, 230, 255)",
+    #             "border": "1px green",
+    #         },
+    #     ]
 
-        style = style_data_conditional.copy()
-        if active:
-            style.append(
-                {
-                    "if": {"row_index": active["row"]},
-                    "backgroundColor": "rgb(204, 230, 255)",
-                    "border": "1px green",
-                },
-            )
-        return style
+    #     style = style_data_conditional.copy()
+    #     if active:
+    #         style.append(
+    #             {
+    #                 "if": {"row_index": active["row"]},
+    #                 "backgroundColor": "rgb(204, 230, 255)",
+    #                 "border": "1px green",
+    #             },
+    #         )
+    #     return style
          
     #update the similar player table and heatmap
     @app.callback(
