@@ -37,17 +37,19 @@ class Table(html.Div):
                                     id=self.html_id,
                                     columns=[{'name': col, 'id': col} for col in df.columns],
                                     data=df.to_dict('records'),
-                                    style_table={'height': '300px', 'overflowY': 'scroll'},
-                                    style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+                                    fixed_rows = {'headers': True},
+                                    style_table={'height': '450px', 'overflowY': 'scroll', 'color': '#ebebeb'},
+                                    style_header={'backgroundColor': 'darkgrey', 'fontWeight': 'bold', 'fontSize': '14px', 'font-family': 'Arial'},
+                                    style_cell = {'backgroundColor': '#ebebeb', 'border-color': '1px blue', 'font-family': 'Arial'},
                                     #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
-                                    style_data={'color': 'black'},
+                                    style_data={'color': '#26232C'},
                                     style_cell_conditional=[
-                                    {'if': {'column_id': 'player'}, 'width': '50%'},
-                                    {'if': {'column_id': self.selected_stat}, 'width': '20%'},
+                                    {'if': {'column_id': 'player'}, 'width': '40%'},
+                                    {'if': {'column_id': self.selected_stat}, 'width': '30%'},
                                     {'if': {'column_id': 'team'}, 'width': '30%'},
             ]
                                     ),
-                style={'margin': 'auto', 'width': '90%', 'padding': 10}
+                style={'margin': 'auto', 'width': '100%', 'padding': 10}
             )
 
         else:

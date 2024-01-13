@@ -17,8 +17,8 @@ class Heatmap(html.Div):
         super().__init__(
             className="graph_card",
             children=
-                dcc.Graph(id=self.html_id, figure=self.initial_heatmap()),
-            style={'margin': 'auto', 'width': '90%','text-align': 'center', 'padding': 10}
+                dcc.Graph(id=self.html_id, figure=self.initial_heatmap(),
+            style={'margin': 'auto', 'width': '100%', 'height': '600px', 'text-align': 'center', 'padding': 10})
         )
     
     def normalize_using_max(self, column):

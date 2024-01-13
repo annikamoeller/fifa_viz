@@ -16,8 +16,8 @@ class Radar(html.Div):
         super().__init__(
             className="graph_card",
             children=
-                dcc.Graph(id=self.html_id),
-            style={'margin': 'auto', 'width': '70%', 'text-align': 'center', 'padding': 20}
+                dcc.Graph(id=self.html_id,
+            style={'margin': 'auto', 'width': '100%', 'height': '600px', 'text-align': 'center', 'padding': 10})
         )
     
     def update(self, on, clickedPlayer=None, hoveredPlayer=None):

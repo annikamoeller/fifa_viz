@@ -26,7 +26,7 @@ class Dropdown(html.Div):
                     value=startingValue,
                     multi=multiple_values
                 )
-            ], style={'margin': 'auto', 'width': '40%', 'color': 'black', 'padding': 20} #Style of the dropdown
+            ], style={'margin': 'auto', 'width': '40%', 'color': 'black', 'padding': 10} #Style of the dropdown
         )
 
     def update(self, on):

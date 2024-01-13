@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     # Set up page on left and right
     left_menu_plots = [gk_switch, table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_card1, similar_player_table, normalization_switch, heatmap_plot, store]
+    right_menu_plots = [radar_plot, info_card1, normalization_switch, heatmap_plot, store]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -278,8 +278,8 @@ if __name__ == '__main__':
          
     #update the similar player table and heatmap
     @app.callback(
-            Output(similar_player_table.html_id, 'data'),
-            Output(similar_player_table.html_id, 'columns'),
+            # Output(similar_player_table.html_id, 'data'),
+            # Output(similar_player_table.html_id, 'columns'),
             Output(heatmap_plot.html_id, 'figure'),
             Input(gk_switch.html_id, 'on'),
             Input(player_data_table.html_id, 'data'),
@@ -317,7 +317,8 @@ if __name__ == '__main__':
         except: 
             pass
 
-        return new_data, columns, new_heatmap
+        #return new_data, columns, new_heatmap
+        return new_heatmap
     
     # update the radar plot based on click and hover data
     @app.callback(
