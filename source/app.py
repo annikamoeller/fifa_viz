@@ -35,6 +35,13 @@ if __name__ == '__main__':
     # group dropdowns together horizontally
     table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
+        #Reset button
+    reset_button = html.Div(html.Button(children='Reset', 
+                                        id='reset_button', 
+                                        n_clicks=0,
+                                        style={'backgroundColor': 'white'}), 
+                                        style={'text-align': 'center'} )
+
     # Scatter plot
     scatter_plot = Scatterplot("scatterplot", main_df, 'goals', 'goals')
     
@@ -66,7 +73,7 @@ if __name__ == '__main__':
     store = dcc.Store(id='highlighted-player-value')
 
     # Set up page on left and right
-    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
+    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, reset_button, scatter_dropdowns, scatter_plot]
     right_menu_plots = [radar_plot, info_card1, normalization_switch, heatmap_plot, store]
 
     #Create left and right side of the page
@@ -244,6 +251,17 @@ if __name__ == '__main__':
     def update_table(selected_stat, team, position, on):
         new_data, new_cols = player_data_table.update(selected_stat, on, team, position)
         return new_data, new_cols
+    
+    # reset the selected cells
+    @app.callback(
+            Output(player_data_table.html_id, 'active_cell', allow_duplicate=True),
+            Output(player_data_table.html_id, 'selected_cells', allow_duplicate=True),
+            Input('reset_button', 'n_clicks'),
+            prevent_initial_call=True
+    )
+    def reset_table(n_clicks):
+        if n_clicks not in [0, None]:
+            return None, []
     
     # Callback to update the style of the selected row
     # @app.callback(
