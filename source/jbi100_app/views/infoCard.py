@@ -14,14 +14,14 @@ class InfoCard(html.Div):
         self.html_id = name.lower().replace(" ", "-")
         # Equivalent to `html.Div([...])`
         super().__init__(
-            className="info_card",
+            className="graph_card",
             children=[
                 dcc.Textarea(
                 id = self.html_id,
                 placeholder = 'No player selected',
                 value = "",
-                style={'width': '50%', 'justifyContent': 'center', 'height': 120, 'padding': 10}
-        )],     style=dict(display='flex', justifyContent='center')
+                style={'width': '30%', 'justifyContent': 'center', 'height': 120, 'padding': 10, 'background-color': '#26232C', 'color': 'white', 'resize': 'none', 'text-align': 'center'}
+        )],     style=dict(display='flex', justifyContent='center', backgroundColor='#26232C', color='white')
 )
 
     def update(self, player_name):

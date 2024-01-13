@@ -43,6 +43,10 @@ label {
     color: white;
 }
 
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: white;
+}
+
 .graph_card h6 {
     margin:  0 7px;
     padding-bottom: 7px;
