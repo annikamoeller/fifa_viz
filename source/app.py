@@ -40,7 +40,8 @@ if __name__ == '__main__':
                                         id='reset_button', 
                                         n_clicks=0,
                                         style={'backgroundColor': 'white'}), 
-                                        style={'text-align': 'center'} )
+                                        style={'text-align': 'center',
+                                               'padding-bottom': '3rem'} )
 
     # Scatter plot
     scatter_plot = Scatterplot("scatterplot", main_df, 'goals', 'goals')
