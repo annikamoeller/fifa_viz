@@ -68,14 +68,18 @@ class Table(html.Div):
                 style={'margin': 'auto', 'width': '80%', 'padding': 10}
             )
     
-    def update(self, selected_stat, team_filter=None, position_filter=None):
+    def update(self, selected_stat, on, team_filter=None, position_filter=None):
         """
         @selected_stat (str): statistic to display selected by user
         @team_filter (str): team(s) to filter by
         @position_filter (str): position(s) to filter by
         @returns ->>> updated data and columns for table
         """
-        df = main_df
+        if on: 
+            position_filter = ['GK']
+            df = gk_df
+        else: df = main_df
+            
         df = df.reset_index()
         df = filter_df(df, team_filter, position_filter)
         df = rank_df(df, selected_stat)
@@ -88,18 +92,20 @@ class Table(html.Div):
     def get_5_similar_players_df(self):
         return self.similar_players_df
 
-    def get_similar_players(self, player, num_similar_players=5):
+    def get_similar_players(self, on, player, num_similar_players=5):
         """
         @player (str): the player for which we want similar players
         @num_similar_players (str): the number of players that we want returned
         @returns ->>> similar player data and columns for table
         """
-        df = main_df
+        if on: df = gk_df
+        else: df = main_df
 
         cleanup_pos = {"position": {"GK": 1, "DF": 2, "MF": 3, "FW": 4}}
         df = df.replace(cleanup_pos)
         df = df.drop(columns='team')
-        df = df.drop(columns='birth_year')
+        if not on:
+            df = df.drop(columns='birth_year')
 
         player = df.loc[player].values
         player = player.reshape(1, -1)

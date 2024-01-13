@@ -30,6 +30,13 @@ class Dropdown(html.Div):
         )
 
     def update(self, on):
-        if on: return list(gk_df.columns), list(gk_df.columns)[0]
+
+        if self.html_id == 'position_dd':
+            if on:
+                options =  ['GK']
+                return options, options
+            else: return self.dropDownValues, None 
+            
+        if on: return gk_stats, gk_stats[0]
         else: return player_stats, player_stats[0]
         

@@ -52,8 +52,7 @@ class Scatterplot(html.Div):
         self.position_filter = position_filter
                
         df = filter_df(df, team_filter, position_filter)
-        df_sizes = filter_df(df_player_stats, team_filter, position_filter)
-        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, size=df_sizes['minutes_90s'], hover_data='player', color='position')
+        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
 
         if player:
             self.highlight_player(fig, player)

@@ -26,16 +26,24 @@ class Heatmap(html.Div):
         if max_val > 0: return column / max_val
         else: return column
 
-    def update(self, selected_player, local_normalization):
+    def update(self, goalkeeper_mode, selected_player, local_normalization):
         """ 
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
 
-        if local_normalization:
-            normalized_df = df_hm.loc[selected_player].apply(self.normalize_using_max)
-        else:
-            normalized_df = df_hm_norm.loc[selected_player]
-        customdata_input = df_hm.loc[selected_player]
+        if not goalkeeper_mode:
+            if local_normalization:
+                normalized_df = df_hm.loc[selected_player].apply(self.normalize_using_max)
+            else:
+                normalized_df = df_hm_norm.loc[selected_player]
+            customdata_input = df_hm.loc[selected_player]
+        else: 
+            #TODO Do the same thing as above but using the GK dataframe
+            if local_normalization:
+                normalized_df = df_hm.loc[selected_player].apply(self.normalize_using_max)
+            else:
+                normalized_df = df_hm_norm.loc[selected_player]
+            customdata_input = df_hm.loc[selected_player]
 
         show_y_ticks = len(normalized_df) <= 9 # if more player are selected than the y axis can fit, dont show names.
 

@@ -30,7 +30,7 @@ if __name__ == '__main__':
     similar_player_table = Table("similar_player_table", None, 'birth_year')
     # drop downs 
     table_stat_dropdown = Dropdown("stat_dd", player_stats, player_stats[0], 'Select statistic')
-    filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF', 'GK'], None, 'Filter by position', multiple_values=True)
+    filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], None, 'Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_list, None, 'Filter by team', multiple_values=True)
     # group dropdowns together horizontally
     table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
@@ -113,12 +113,18 @@ if __name__ == '__main__':
         Output(x_axis_dropdown.html_id, 'value'),
         Output(y_axis_dropdown.html_id, 'options'),
         Output(y_axis_dropdown.html_id, 'value'),
+        Output(filter_position_dropdown.html_id, 'options'),
+        Output(filter_position_dropdown.html_id, 'value'),
+        Output(table_stat_dropdown.html_id, 'options'),
+        Output(table_stat_dropdown.html_id, 'value'),
         Input(gk_switch.html_id, 'on')
     )
     def toggle_gk_mode(on):
         x_options, x_value = x_axis_dropdown.update(on)
         y_options, y_value = y_axis_dropdown.update(on)
-        return x_options, x_value, y_options, y_value
+        filter_options, filter_value = filter_position_dropdown.update(on)
+        table_stat_options, table_stat_value = table_stat_dropdown.update(on)
+        return x_options, x_value, y_options, y_value, filter_options, filter_value, table_stat_options, table_stat_value
     
     # update the scatter plot based on the x and y drop downs
     @app.callback(
@@ -177,10 +183,11 @@ if __name__ == '__main__':
             Output(player_data_table.html_id, 'columns'),
             Input(table_stat_dropdown.html_id, 'value'),
             Input(filter_team_dropdown.html_id, 'value'),
-            Input(filter_position_dropdown.html_id, 'value')
+            Input(filter_position_dropdown.html_id, 'value'),
+            Input(gk_switch.html_id, 'on')
     )
-    def update_table(selected_stat, team, position):
-        new_data, new_cols = player_data_table.update(selected_stat, team, position)
+    def update_table(selected_stat, team, position, on):
+        new_data, new_cols = player_data_table.update(selected_stat, on, team, position)
         return new_data, new_cols
     
     # Callback to update the style of the selected row
@@ -219,6 +226,7 @@ if __name__ == '__main__':
             Output(similar_player_table.html_id, 'data'),
             Output(similar_player_table.html_id, 'columns'),
             Output(heatmap_plot.html_id, 'figure'),
+            Input(gk_switch.html_id, 'on'),
             Input(player_data_table.html_id, 'data'),
             Input(player_data_table.html_id, 'active_cell'),
             Input(player_data_table.html_id, 'columns'),
@@ -226,7 +234,7 @@ if __name__ == '__main__':
             Input('highlighted-player-value', 'data'),
             Input(scatter_plot.html_id, 'selectedData')
     )
-    def update_similar_players(data, clicked_cell, columns, local_normalization, highlight_player_data, selected_players_in_scatter_plot):
+    def update_similar_players(goalkeeper_mode, data, clicked_cell, columns, local_normalization, highlight_player_data, selected_players_in_scatter_plot):
         # Function partly broken, only updates heatmap when no players are selected in the scatterplot.
         player = json.loads(highlight_player_data)
 
@@ -240,10 +248,10 @@ if __name__ == '__main__':
         new_heatmap = heatmap_plot.initial_heatmap()
 
         if player:
-            new_data, columns = similar_player_table.get_similar_players(player)
+            new_data, columns = similar_player_table.get_similar_players(goalkeeper_mode, player)
             similar_players = similar_player_table.get_5_similar_players_df()
             similar_player_names = similar_players.index.tolist()
-            new_heatmap = heatmap_plot.update(similar_player_names, local_normalization)
+            new_heatmap = heatmap_plot.update(goalkeeper_mode, similar_player_names, local_normalization)
         
         try:
             selected_names_in_scatter_plot = [player['customdata'][0] for player in selected_players_in_scatter_plot['points']]
@@ -260,9 +268,10 @@ if __name__ == '__main__':
     @app.callback(
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'hoverData'),
-    Input('highlighted-player-value', 'data')
+    Input('highlighted-player-value', 'data'),
+    Input(gk_switch.html_id, 'on')
     )
-    def selected_player(hover, highlight_player_data):
+    def selected_player(hover, highlight_player_data, on):
         """
         Get clicked, hovered player and stats dropdown value 
         return a radar figure with the stats of the selected players and dropdown
@@ -272,7 +281,7 @@ if __name__ == '__main__':
         if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
         else: hoveredPlayer = None
 
-        return radar_plot.update(highlight_player_data, hoveredPlayer)
+        return radar_plot.update(on, highlight_player_data, hoveredPlayer)
 
     # update info card to display basic player info when clicked on in scatter plot 
     @app.callback(

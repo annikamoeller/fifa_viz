@@ -59,6 +59,7 @@ team = df_player_misc['team']
 
 # create main dataframe
 main_df = pd.concat([goals, xg, birth_year, assists, appearances, yellow_cards, red_cards, passes, touches, shots, offsides, tackles, fouls, dispossessed, own_goals, clearances, position, team], axis=1)
+main_df = main_df.drop(main_df[main_df['position'] == 'GK'].index)
 
 # teams for table drop down
 teams_list = list(main_df['team'].unique())
@@ -72,8 +73,12 @@ player_stats.remove('position')
 main_df.fillna("No data")
 
 # create goalkeeper df
-gk_df = pd.merge(df_player_keepers[['player', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
+gk_df = pd.merge(df_player_keepers[['player', 'team', 'position', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
 gk_df = gk_df.set_index('player')
+# statistics for table drop down
+gk_stats = list(gk_df.columns)
+gk_stats.remove('team')
+gk_stats.remove('position')
 
 # basic player info df for info card
 df_player_basic = df_player_misc[['birth_year', 'team', 'position']]

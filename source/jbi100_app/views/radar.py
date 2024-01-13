@@ -20,12 +20,13 @@ class Radar(html.Div):
             style={'margin': 'auto', 'width': '70%', 'text-align': 'center', 'padding': 20}
         )
     
-    def update(self, clickedPlayer=None, hoveredPlayer=None):
+    def update(self, on, clickedPlayer=None, hoveredPlayer=None):
         """ 
         @clickedPlayer (str) = The clicked player name
         @hoveredPlayer (str) = The hovered player name
         """
-        df = self.df
+        if on: df = gk_df
+        else: df = self.df
 
         #If nothing is clicked or hovered create an empty radar
         if clickedPlayer is None and hoveredPlayer is None: return self.clear(df)
