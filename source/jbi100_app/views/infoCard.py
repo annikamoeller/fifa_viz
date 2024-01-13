@@ -17,11 +17,12 @@ class InfoCard(html.Div):
             className="graph_card",
             children=[
                 dcc.Textarea(
+                disabled = True,
                 id = self.html_id,
                 placeholder = 'No player selected',
                 value = "",
                 style={'width': '30%', 'justifyContent': 'center', 'height': 120, 'padding': 10, 'background-color': '#26232C', 'color': 'white', 'resize': 'none', 'text-align': 'center'}
-        )],     style=dict(display='flex', justifyContent='center', backgroundColor='#26232C', color='white')
+        )],     style=dict(display='flex', justifyContent='center', backgroundColor='#26232C', color='white'), 
 )
 
     def update(self, player_name):
