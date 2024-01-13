@@ -200,13 +200,14 @@ if __name__ == '__main__':
             elif prev_scatter_click != scatter_player: 
                 player = scatter_player
                 style = white_highlight_style.copy()
-                style.append(
-                    {
-                        "if": {"row_index": clicked_cell["row"]},
-                        "backgroundColor": "white",
-                        "line_color": "1px black"
-                    },
-                )
+                if clicked_cell: 
+                    style.append(
+                        {
+                            "if": {"row_index": clicked_cell["row"]},
+                            "backgroundColor": "white",
+                            "line_color": "1px black"
+                        },
+                    )
             #if we change labels or filters we persist the table click value,
             #otherwise, we set the clicked players in scatter_plot
             if x_label != scatter_plot.x_axis_stat \
