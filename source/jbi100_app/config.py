@@ -122,3 +122,24 @@ df_possesion['Dispossessed per 90s'] = df_player_possession['dispossessed'] / df
 df_hm = pd.concat([df_attack, df_defense, df_possesion], axis=1)
 df_hm.replace([np.inf, -np.inf], 0, inplace=True)
 df_hm_norm = df_hm.apply(normalize_df)
+
+
+#Goalkeeper Dataframe for the Heatmap
+df_keepers = df_player_keepers[['player', 'gk_goals_against_per90', 'gk_save_pct', 'gk_clean_sheets_pct', 'gk_pens_save_pct']]
+df_keepers.set_index('player', inplace=True)
+
+df_keepersadv = df_player_keepersadv[['player', 'gk_passes_pct_launched', 'gk_passes_length_avg', 'gk_crosses_stopped_pct']]
+df_keepersadv.set_index('player', inplace=True)
+
+df_gk_hm = pd.concat([df_keepers, df_keepersadv], axis=1)
+df_gk_hm.fillna(0, inplace=True)
+
+df_gk_hm.rename(columns={'gk_goals_against_per90':'Goals conceded per 90s',
+                         'gk_save_pct':'Goals saved percentage',
+                         'gk_clean_sheets_pct':'Clean sheets percentage',
+                         'gk_pens_save_pct': 'Penalty save percentage',
+                         'gk_passes_pct_launched':'Percentage of successful passes',
+                         'gk_passes_length_avg':'Average pass lenght',
+                        'gk_crosses_stopped_pct':'Stopped crosses percentage' }, inplace=True)
+
+df_gk_hm_norm = df_gk_hm.apply(normalize_df)

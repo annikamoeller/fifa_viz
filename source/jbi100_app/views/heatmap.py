@@ -38,12 +38,11 @@ class Heatmap(html.Div):
                 normalized_df = df_hm_norm.loc[selected_player]
             customdata_input = df_hm.loc[selected_player]
         else: 
-            #TODO Do the same thing as above but using the GK dataframe
             if local_normalization:
-                normalized_df = df_hm.loc[selected_player].apply(self.normalize_using_max)
+                normalized_df = df_gk_hm.loc[selected_player].apply(self.normalize_using_max)
             else:
-                normalized_df = df_hm_norm.loc[selected_player]
-            customdata_input = df_hm.loc[selected_player]
+                normalized_df = df_gk_hm_norm.loc[selected_player]
+            customdata_input = df_gk_hm.loc[selected_player]
 
         show_y_ticks = len(normalized_df) <= 9 # if more player are selected than the y axis can fit, dont show names.
 
@@ -60,12 +59,15 @@ class Heatmap(html.Div):
         
         return self.update_heatmap_layout(fig, show_y_ticks)
     
-    def initial_heatmap(self):
+    def initial_heatmap(self, goalkeeper_mode=False):
         """
         Creates a basic heatmap with the top 5 values from main_df
         @return (figure) created heatmap figure
         """
-        first_five_values_df = df_hm_norm.head(5)
+        if goalkeeper_mode:
+            first_five_values_df = df_gk_hm_norm.head(5)
+        else:
+            first_five_values_df = df_hm_norm.head(5)
 
         fig = go.Figure()
 
