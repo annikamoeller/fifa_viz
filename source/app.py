@@ -320,7 +320,7 @@ if __name__ == '__main__':
 
         new_data = []
         columns = []
-        new_heatmap = heatmap_plot.initial_heatmap()
+        new_heatmap = heatmap_plot.initial_heatmap(goalkeeper_mode=goalkeeper_mode)
 
         if player:
             new_data, columns = similar_player_table.get_similar_players(goalkeeper_mode, player)
