@@ -172,12 +172,12 @@ if __name__ == '__main__':
         white_highlight_style = [
         {
             "if": {"state": "selected"},
-            "backgroundColor": "white",
+            "backgroundColor": "#ebebeb",
             "line_color": "1px black"
         },
         {
             "if": {"state": "active"},
-            "backgroundColor": "white",
+            "backgroundColor": "#ebebeb",
             "line_color": "1px black"
         }
         ]
@@ -212,7 +212,7 @@ if __name__ == '__main__':
                     style.append(
                         {
                             "if": {"row_index": clicked_cell["row"]},
-                            "backgroundColor": "white",
+                            "backgroundColor": "#ebebeb",
                             "line_color": "1px black"
                         },
                     )
@@ -229,7 +229,7 @@ if __name__ == '__main__':
                     style.append(
                         {
                             "if": {"row_index": clicked_cell["row"]},
-                            "backgroundColor": "white",
+                            "backgroundColor": "#ebebeb",
                             "line_color": "1px black"
                         },
                     )
