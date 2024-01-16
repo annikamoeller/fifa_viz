@@ -48,7 +48,7 @@ class Heatmap(html.Div):
 
         fig = go.Figure()
         fig.add_trace(go.Heatmap(
-            name="",
+            name="", # removes 'trace' label when hovering
             customdata=customdata_input,
             z=normalized_df,
             x=normalized_df.columns,
@@ -66,15 +66,20 @@ class Heatmap(html.Div):
         """
         if goalkeeper_mode:
             first_five_values_df = df_gk_hm_norm.head(5)
+            customdata_input = df_gk_hm.head()
         else:
             first_five_values_df = df_hm_norm.head(5)
+            customdata_input = df_hm.head()
 
         fig = go.Figure()
 
         fig.add_trace(go.Heatmap(
+            name="", # removes 'trace' label when hovering
             z=first_five_values_df,
             x=first_five_values_df.columns,
             y=first_five_values_df.index,
+            customdata=customdata_input,
+            hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
             colorscale='Viridis'))
         
         return self.update_heatmap_layout(fig, True)

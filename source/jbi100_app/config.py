@@ -118,7 +118,7 @@ df_possesion['Miscontrol per 90s'] = df_player_possession['miscontrols'] / df_pl
 df_possesion['Dispossessed per 90s'] = df_player_possession['dispossessed'] / df_player_possession['minutes_90s']
 
 
-# Concatenate of dataframes
+# Concatenate of dataframes (hm=heatmap)
 df_hm = pd.concat([df_attack, df_defense, df_possesion], axis=1)
 df_hm.replace([np.inf, -np.inf], 0, inplace=True)
 df_hm_norm = df_hm.apply(normalize_df)
@@ -143,3 +143,8 @@ df_gk_hm.rename(columns={'gk_goals_against_per90':'Goals conceded per 90s',
                         'gk_crosses_stopped_pct':'Stopped crosses percentage' }, inplace=True)
 
 df_gk_hm_norm = df_gk_hm.apply(normalize_df)
+
+
+## NAN-Filled Dataframes by median imputation. (main & gk)
+df_hm_filled = df_hm.apply(median_imputation_of_nan)
+df_gk_hm_filled = df_gk_hm.apply(median_imputation_of_nan)

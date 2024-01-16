@@ -98,14 +98,16 @@ class Table(html.Div):
         @num_similar_players (str): the number of players that we want returned
         @returns ->>> similar player data and columns for table
         """
-        if on: df = gk_df
-        else: df = main_df
+        # if on: df = gk_df
+        # else: df = main_df
+        if on: df = df_gk_hm_filled
+        else: df = df_hm_filled
 
-        cleanup_pos = {"position": {"GK": 1, "DF": 2, "MF": 3, "FW": 4}}
-        df = df.replace(cleanup_pos)
-        df = df.drop(columns='team')
-        if not on:
-            df = df.drop(columns='birth_year')
+        # cleanup_pos = {"position": {"GK": 1, "DF": 2, "MF": 3, "FW": 4}}
+        # df = df.replace(cleanup_pos)
+        # # df = df.drop(columns='team')
+        # if not on:
+        #     df = df.drop(columns='birth_year')
 
         player = df.loc[player].values
         player = player.reshape(1, -1)

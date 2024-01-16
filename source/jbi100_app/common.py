@@ -1,3 +1,5 @@
+import numpy as np
+
 """ This file is to store functions used in several places """
 
 def filter_df(df, team_filter, position_filter):
@@ -22,3 +24,7 @@ def normalize_df(column):
     max_val = column.max()
     normalized_column = column / max_val
     return normalized_column
+
+def median_imputation_of_nan(col):
+    col_median = np.median(col.dropna())
+    return col.fillna(col_median) 

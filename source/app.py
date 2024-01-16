@@ -333,7 +333,7 @@ if __name__ == '__main__':
             if not selected_names_in_scatter_plot:
                 pass
             else:
-                new_heatmap = heatmap_plot.update(selected_names_in_scatter_plot, local_normalization)
+                new_heatmap = heatmap_plot.update(goalkeeper_mode, selected_names_in_scatter_plot, local_normalization)
         except: 
             pass
 
