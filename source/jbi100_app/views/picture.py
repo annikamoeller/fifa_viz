@@ -14,17 +14,12 @@ class Picture(html.Div):
         @label (str): the title above the dropdown, leave empty for none
         """
         self.html_id = name.lower().replace(" ", "-")
-        #Using Pillow to read the the image
-
-        # im = cv2.imread("jbi100_app/assets/soccer_field_3.jpg")
-        
-        pil_img = Image.open(open("jbi100_app/assets/soccer_field_3.jpg", 'rb'))
 
         # Equivalent to `html.Div([...])`
         super().__init__(
             className="graph_card",
             children=[
-                html.Img(id=self.html_id, src=pil_img)],     
+                html.Img(id=self.html_id)],     
                 style=dict(display='flex', justifyContent='left', backgroundColor='#26232C', color='white'), 
 )
         
