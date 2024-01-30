@@ -36,6 +36,8 @@ class Table(html.Div):
                     dash_table.DataTable(
                                     id=self.html_id,
                                     columns=[{'name': col, 'id': col} for col in df.columns],
+                                    page_current=0,
+                                    page_size=20,
                                     data=df.to_dict('records'),
                                     sort_action = 'native',
                                     fixed_rows = {'headers': True},

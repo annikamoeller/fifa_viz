@@ -53,7 +53,7 @@ class Scatterplot(html.Div):
         self.position_filter = position_filter
                
         df = filter_df(df, team_filter, position_filter)
-        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position', opacity=0.5)
+        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
         fig.update_traces(marker=dict(
             size=10
         ))
@@ -94,7 +94,7 @@ class Scatterplot(html.Div):
             # Set default point styles.
             n = len(trace.x)
             color = [trace.marker.color] * n
-            opacity = [0.5] * n
+            opacity = [1] * n
             size = [10] * n
             #this gets a numpy array with the player idx
             idx = np.where(trace.customdata == player)[0] 
@@ -122,9 +122,9 @@ class Scatterplot(html.Div):
                     idx = 1
 
                 self.highlighted_player = player
-                opacity = [0.8] * n
+                opacity = [1] * n
                 color[idx] = "yellow"
-                size[idx] = 15
+                size[idx] = 20
             # Update trace.
             trace.marker.color = color
             trace.marker.size = size

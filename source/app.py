@@ -153,9 +153,10 @@ if __name__ == '__main__':
         Input(filter_team_dropdown.html_id, 'value'),
         Input(filter_position_dropdown.html_id, 'value'),
         Input(player_data_table.html_id, 'data'),
-        Input(player_data_table.html_id, 'active_cell')
-                )
-    def update_scatter(on, click, x_label, y_label, selected_stat, team_filter, position_filter, clicked_table_player_data, clicked_cell):
+        Input(player_data_table.html_id, "page_current"),
+        Input(player_data_table.html_id, "page_size"),
+        Input(player_data_table.html_id, 'active_cell'))
+    def update_scatter(on, click, x_label, y_label, selected_stat, team_filter, position_filter, clicked_table_player_data, current_page, page_size, clicked_cell):
         """
         Return a figure with a teams plot based on team dropdown value 
         """
@@ -199,7 +200,7 @@ if __name__ == '__main__':
 
         #get the last clicked scatter and table clicked player 
         if clicked_table_player_data and clicked_cell: 
-            table_player = clicked_table_player_data[clicked_cell['row']]['player']
+            table_player = clicked_table_player_data[clicked_cell['row']+(current_page)*page_size]['player']
         else: table_player = None
         
         if click: scatter_player = click['points'][0]['customdata'][0] #get click data
