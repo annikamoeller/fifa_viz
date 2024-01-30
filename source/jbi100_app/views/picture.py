@@ -25,7 +25,7 @@ class Picture(html.Div):
             className="graph_card",
             children=[
                 html.Img(id=self.html_id, src=pil_img)],     
-                style=dict(display='flex', justifyContent='center', backgroundColor='#26232C', color='white'), 
+                style=dict(display='flex', justifyContent='left', backgroundColor='#26232C', color='white'), 
 )
         
     def update(self, name, random_number):

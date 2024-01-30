@@ -21,8 +21,8 @@ class InfoCard(html.Div):
                 id = self.html_id,
                 placeholder = 'No player selected',
                 value = "",
-                style={'width': '30%', 'justifyContent': 'center', 'height': 145, 'padding': 10, 'background-color': '#26232C', 'color': 'white', 'resize': 'none', 'text-align': 'center'}
-        )],     style=dict(display='flex', justifyContent='center', backgroundColor='#26232C', color='white'), 
+                style={'width': '100%', 'justifyContent': 'right', 'height': 145, 'padding': 10, 'background-color': '#26232C', 'color': 'white', 'resize': 'none', 'text-align': 'left', 'border': 'none'}
+        )],     style=dict(display='flex', backgroundColor='#26232C', color='white'), 
 )
 
     def update(self, player_name):

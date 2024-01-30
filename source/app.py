@@ -57,15 +57,17 @@ if __name__ == '__main__':
     radar_plot = Radar("radar", main_df)
 
     # player 1 info card
+    
     info_card1 = InfoCard("infocard1")
 
     player_image = Picture("image")
+    info_and_image =  html.Div(id='info-and-image', children=[player_image, info_card1], style={'display': 'flex', 'flexDirection': 'row'})
 
     # player 2 info card
     #info_card2 = InfoCard("infocard2")
 
     # radar and info card grouping 
-    radar_and_info = html.Div([radar_plot, info_card1], style={'display': 'flex', 'flexDirection': 'row'})
+    # radar_and_info = html.Div([radar_plot, info_card1], style={'display': 'flex', 'flexDirection': 'row'})
 
     # Heatmap plot
     normalization_switch = NormalizationSwitch('normalization_switch')
@@ -78,7 +80,7 @@ if __name__ == '__main__':
 
     # Set up page on left and right
     left_menu_plots = [gk_switch, table_dropdowns, player_data_table, reset_button, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [player_image, radar_plot, info_card1, normalization_switch, heatmap_plot, store]
+    right_menu_plots = [radar_plot, info_and_image, normalization_switch, heatmap_plot, store]
 
     #Create left and right side of the page
     app.layout = html.Div(
