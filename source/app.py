@@ -10,6 +10,7 @@ from jbi100_app.views.heatmap import *
 from jbi100_app.views.infoCard import *
 from jbi100_app.views.table import *
 from jbi100_app.views.normalization_switch import *
+from jbi100_app.views.picture import *
 
 from jbi100_app.views.multival_dropdown import *
 from dash import html
@@ -58,6 +59,8 @@ if __name__ == '__main__':
     # player 1 info card
     info_card1 = InfoCard("infocard1")
 
+    player_image = Picture("image")
+
     # player 2 info card
     #info_card2 = InfoCard("infocard2")
 
@@ -75,7 +78,7 @@ if __name__ == '__main__':
 
     # Set up page on left and right
     left_menu_plots = [gk_switch, table_dropdowns, player_data_table, reset_button, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_card1, normalization_switch, heatmap_plot, store]
+    right_menu_plots = [player_image, radar_plot, info_card1, normalization_switch, heatmap_plot, store]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -331,12 +334,13 @@ if __name__ == '__main__':
     # update info card to display basic player info when clicked on in scatter plot 
     @app.callback(
         Output(info_card1.html_id, 'value'),
+        Output(player_image.html_id, 'src'),
         Input('highlighted-player-value', 'data')
     )
     def info_card(highlight_player_data):
         highlight_player_data = json.loads(highlight_player_data)
         if highlight_player_data:
-            return info_card1.update(highlight_player_data)
-        else: return "" #empty infocard
+            return info_card1.update(highlight_player_data), player_image.update(highlight_player_data, 13)
+        else: return "", "" #empty infocard
     
     app.run_server(debug=True, dev_tools_ui=True)
