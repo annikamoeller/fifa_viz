@@ -2,6 +2,7 @@ from dash import dcc, html
 from jbi100_app.config import *
 from PIL import Image
 from unidecode import unidecode
+import random
 
 class Picture(html.Div):
  
@@ -37,7 +38,10 @@ class Picture(html.Div):
                                 player_folder_no_Images_or_captain = player_folder_no_Images_.split('(')[0].strip() # remove (captain)
                                 player_folder_no_Images_captain_or_accents = unidecode(player_folder_no_Images_or_captain) # remove accents for comparison
                                 name_processed = unidecode(name) # remove accents for comparison
+                                # print(player_name_processed)
                                 player_name_path = os.path.join(team_path, player_folder)
+                                n_images = len(os.listdir(player_name_path))
+                                random_number = random.randint(1,n_images)
                                 if player_folder_no_Images_captain_or_accents == name_processed:
                                     img_path = os.path.join(player_name_path, f'{player_folder_no_Images_}{random_number}.jpg')
                                     pil_img = Image.open(img_path)

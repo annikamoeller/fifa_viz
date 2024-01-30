@@ -27,5 +27,5 @@ class InfoCard(html.Div):
 
     def update(self, player_name):
         if player_name:
-            return f"Name: {player_name} \n Birth year: {df_player_basic.loc[player_name]['birth_year']} \n Team: {df_player_basic.loc[player_name]['team']} \n Position: {df_player_basic.loc[player_name]['position']} \n Minutes played: {df_player_basic.loc[player_name]['minutes_90s']*90}"
+            return f"Name: {player_name} \n Birth year: {df_player_basic.loc[player_name]['birth_year']} \n Team: {df_player_basic.loc[player_name]['team']} \n Position: {df_player_basic.loc[player_name]['position']} \n Minutes played: {int(df_player_basic.loc[player_name]['minutes_90s']*90)}"
         
