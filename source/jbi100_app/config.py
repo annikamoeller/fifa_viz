@@ -115,7 +115,7 @@ df_possesion = pd.DataFrame()
 # df_possesion['Player'] = df_player_possession.index
 # df_possesion = df_possesion.set_index('Player')
 df_possesion['Touches per 90s'] = df_player_possession['touches'] / df_player_possession['minutes_90s']
-df_possesion['Dribble Succes'] = df_player_possession['dribbles_completed_pct']
+df_possesion['Dribble Success'] = df_player_possession['dribbles_completed_pct']
 df_possesion['Miscontrol per 90s'] = df_player_possession['miscontrols'] / df_player_possession['minutes_90s']
 df_possesion['Dispossessed per 90s'] = df_player_possession['dispossessed'] / df_player_possession['minutes_90s']
 
@@ -150,3 +150,128 @@ df_gk_hm_norm = df_gk_hm.apply(normalize_df)
 ## NAN-Filled Dataframes by median imputation. (main & gk)
 df_hm_filled = df_hm.apply(median_imputation_of_nan)
 df_gk_hm_filled = df_gk_hm.apply(median_imputation_of_nan)
+
+
+
+######## Dataframe for radar plot
+minutes = df_player_stats['minutes_90s']
+
+# gather useful statistics 
+#attack
+goals = df_player_shooting['goals']
+shots_on_target_pct= df_player_shooting['shots_on_target_pct']
+goals_per_shot= df_player_shooting['goals_per_shot']
+average_shot_distance= df_player_shooting['average_shot_distance']
+pens_made= df_player_shooting['pens_made']
+pens_att= df_player_shooting['pens_att']
+
+#defense
+tackles = df_player_defense['tackles']
+tackles_won = df_player_defense['tackles_won']
+clearances = df_player_defense['clearances']
+blocks = df_player_defense['blocks']
+errors = df_player_defense['errors']
+
+#control
+touches = df_player_possession['touches']
+dispossessed = df_player_possession['dispossessed']
+aerials_won_pct = df_player_misc['aerials_won_pct']
+dribbles_completed_pct = df_player_possession['dribbles_completed_pct']
+passes_received = df_player_possession['passes_received']
+miscontrols  = df_player_possession['miscontrols']
+
+#passing
+assists = df_player_stats['assists']
+passes_pct = df_player_passing['passes_pct']
+passes_total_distance = df_player_passing['passes_total_distance']
+passes_pct_long = df_player_passing['passes_pct_long']
+progressive_passes = df_player_passing['progressive_passes']
+
+#discipline
+red_cards = df_player_stats['cards_red']
+yellow_cards = df_player_stats['cards_yellow']
+fouls = df_player_misc['fouls']
+
+
+
+# create main dataframe
+df_radar_main = pd.concat([position,
+                     goals, shots_on_target_pct, goals_per_shot, average_shot_distance,pens_made,pens_att,
+                     tackles,tackles_won, clearances, blocks, errors,
+                     touches, dispossessed, aerials_won_pct, dribbles_completed_pct, passes_received, miscontrols,
+                     assists, passes_pct, passes_total_distance, passes_pct_long, progressive_passes,
+                     red_cards, yellow_cards, fouls, minutes
+                     ], axis=1)
+df_radar_main = df_radar_main.drop(df_radar_main[df_radar_main['position'] == 'GK'].index)
+
+
+df_radar_main.replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+
+df_radar = pd.DataFrame()
+
+def get_attack_score(row):
+    if (row['pens_att'] == 0): pens = 0
+    else: pens = row['pens_made'] / row['pens_att']
+
+    if row['minutes_90s'] == 0: goals = 0
+    else: goals = row['goals']/row['minutes_90s']
+
+
+    score = 1 + (pens 
+             + goals
+             + 2*row['goals_per_shot']/df_player_shooting['goals_per_shot'].max() 
+             + row['shots_on_target_pct']/100
+             + row['average_shot_distance']/df_player_shooting['average_shot_distance'].max() )
+
+    return min(score, 5)
+
+def get_defense_score(row):
+    if (row['tackles'] == 0): tackles = 0
+    else: tackles = row['tackles_won'] / row['tackles']
+
+    score = 1 +(5/3*tackles 
+             + 5/3*row['blocks']/df_player_defense['blocks'].max()
+             + 5/3*row['clearances']/df_player_defense['blocks'].max() 
+             - 2*row['errors'])
+
+    return min(max(score, 0),5)
+
+def get_control_score(row):
+    if row['passes_received'] == 0: pen = 0
+    else: pen = (row['miscontrols']+row['dispossessed'])/( row['passes_received'])
+
+    score = 1+ (2*row['aerials_won_pct']/100
+             + row['touches']/df_player_possession['touches'].max()
+             + 2*row['dribbles_completed_pct']/100
+             - pen)
+
+    return min(max(score, 0), 5)
+
+def get_passing_score(row):
+
+    score = 1 + (row['passes_pct']/100
+             + 0.5*row['passes_total_distance']/df_player_passing['passes_total_distance'].max()
+             + 0.25*row['passes_pct_long']/100
+             + 2.5*row['assists']/df_player_passing['assists'].max()
+             + 0.75*row['progressive_passes']/df_player_passing['progressive_passes'].max())
+
+    return min(score,5)
+
+def get_discipline_score(row):
+
+    if row['minutes_90s'] == 0:
+        return 5
+    else:
+        score = 5 - (2.5*row['cards_red']
+             + 5/3* row['cards_yellow']
+             + row['fouls'])/row['minutes_90s']
+
+    return max(score, 0)
+
+
+# Applying the function to each row using apply with axis=1
+df_radar['Attack'] = df_radar_main.apply(get_attack_score, axis=1)
+df_radar['Defense'] = df_radar_main.apply(get_defense_score, axis=1)
+df_radar['Control'] = df_radar_main.apply(get_control_score, axis=1)
+df_radar['Passing'] = df_radar_main.apply(get_passing_score, axis=1)
+df_radar['Discipline'] = df_radar_main.apply(get_discipline_score, axis=1)

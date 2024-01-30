@@ -54,7 +54,7 @@ if __name__ == '__main__':
     scatter_dropdowns = html.Div([x_axis_dropdown, y_axis_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
     # Radar plot
-    radar_plot = Radar("radar", main_df)
+    radar_plot = Radar("radar", df_radar)
 
     # player 1 info card
     
