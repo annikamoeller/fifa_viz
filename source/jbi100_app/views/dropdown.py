@@ -19,14 +19,15 @@ class Dropdown(html.Div):
         super().__init__(
             className="graph_card",
             children=[
-                html.Label(label),
+                html.Label(label, 
+                           style = {'text-align': 'left'}),
                 dcc.Dropdown(
                     id=self.html_id,
                     options=dropDownValues,
                     value=startingValue,
                     multi=multiple_values
                 )
-            ], style={'margin': 'auto', 'width': '40%', 'color': 'black', 'padding': 10} #Style of the dropdown
+            ], style={'margin': 'auto', 'width': '25%', 'color': 'black', 'padding': 10} #Style of the dropdown
         )
 
     def update(self, on):

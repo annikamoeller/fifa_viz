@@ -33,7 +33,7 @@ if __name__ == '__main__':
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], None, 'Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_list, None, 'Filter by team', multiple_values=True)
     # group dropdowns together horizontally
-    table_dropdowns = html.Div([table_stat_dropdown, filter_position_dropdown, filter_team_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
+    table_dropdowns = html.Div([table_stat_dropdown, filter_team_dropdown,filter_position_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
         #Reset button
     reset_button = html.Div(html.Button(children='Reset', 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         filter_options, filter_value = filter_position_dropdown.update(on)
         table_stat_options, table_stat_value = table_stat_dropdown.update(on)
         return x_options, x_value, y_options, y_value, filter_options, filter_value, table_stat_options, table_stat_value
-    
+
     # update the scatter plot based on the x and y drop downs
     @app.callback(
         Output(scatter_plot.html_id, 'figure'),
@@ -169,7 +169,7 @@ if __name__ == '__main__':
         }
         ]
 
-        white_highlight_style = [
+        lightgrey_highlight_style = [
         {
             "if": {"state": "selected"},
             "backgroundColor": "#ebebeb",
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
             elif prev_scatter_click != scatter_player: 
                 player = scatter_player
-                style = white_highlight_style.copy()
+                style = lightgrey_highlight_style.copy()
                 if clicked_cell: 
                     style.append(
                         {
@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
                     player = table_player
                     scatter_plot.set_click_player(table_player, None)
-                    style = white_highlight_style.copy()
+                    style = lightgrey_highlight_style.copy()
                     style.append(
                         {
                             "if": {"row_index": clicked_cell["row"]},
@@ -247,7 +247,8 @@ if __name__ == '__main__':
             Input(table_stat_dropdown.html_id, 'value'),
             Input(filter_team_dropdown.html_id, 'value'),
             Input(filter_position_dropdown.html_id, 'value'),
-            Input(gk_switch.html_id, 'on')
+            Input(gk_switch.html_id, 'on'),
+            #Input(player_data_table.html_id, 'active_cell')
     )
     def update_table(selected_stat, team, position, on):
         new_data, new_cols = player_data_table.update(selected_stat, on, team, position)
@@ -263,38 +264,6 @@ if __name__ == '__main__':
     def reset_table(n_clicks):
         if n_clicks not in [0, None]:
             return None, []
-    
-    # Callback to update the style of the selected row
-    # @app.callback(
-    #     Output(player_data_table.html_id, 'style_data_conditional'),
-    #     Input(player_data_table.html_id, 'active_cell'),
-    #     Input('highlighted-player-value', 'data')
-    # )
-    # def update_selected_row_color(active, highlight_player):
-
-    #     style_data_conditional = [
-    #         {
-    #             "if": {"state": "active"},
-    #             "backgroundColor": "rgb(204, 230, 255)",
-    #             "border": "1px green",
-    #         },
-    #         {
-    #             "if": {"state": "selected"},
-    #             "backgroundColor": "rgb(204, 230, 255)",
-    #             "border": "1px green",
-    #         },
-    #     ]
-
-    #     style = style_data_conditional.copy()
-    #     if active:
-    #         style.append(
-    #             {
-    #                 "if": {"row_index": active["row"]},
-    #                 "backgroundColor": "rgb(204, 230, 255)",
-    #                 "border": "1px green",
-    #             },
-    #         )
-    #     return style
          
     #update the similar player table and heatmap
     @app.callback(

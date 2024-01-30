@@ -21,11 +21,11 @@ class InfoCard(html.Div):
                 id = self.html_id,
                 placeholder = 'No player selected',
                 value = "",
-                style={'width': '30%', 'justifyContent': 'center', 'height': 120, 'padding': 10, 'background-color': '#26232C', 'color': 'white', 'resize': 'none', 'text-align': 'center'}
+                style={'width': '30%', 'justifyContent': 'center', 'height': 145, 'padding': 10, 'background-color': '#26232C', 'color': 'white', 'resize': 'none', 'text-align': 'center'}
         )],     style=dict(display='flex', justifyContent='center', backgroundColor='#26232C', color='white'), 
 )
 
     def update(self, player_name):
         if player_name:
-            return f"Name: {player_name} \n Birth year: {df_player_basic.loc[player_name]['birth_year']} \n Team: {df_player_basic.loc[player_name]['team']} \n Position: {df_player_basic.loc[player_name]['position']}"
+            return f"Name: {player_name} \n Birth year: {df_player_basic.loc[player_name]['birth_year']} \n Team: {df_player_basic.loc[player_name]['team']} \n Position: {df_player_basic.loc[player_name]['position']} \n Minutes played: {df_player_basic.loc[player_name]['minutes_90s']*90}"
         

@@ -63,11 +63,13 @@ main_df = main_df.drop(main_df[main_df['position'] == 'GK'].index)
 
 # teams for table drop down
 teams_list = list(main_df['team'].unique())
+teams_list = sorted(teams_list)
 
 # statistics for table drop down
 player_stats = list(main_df.columns)
 player_stats.remove('team')
 player_stats.remove('position')
+player_stats = sorted(player_stats)
 
 # fill NaN values with "No data available message"
 main_df.fillna("No data")
@@ -81,7 +83,7 @@ gk_stats.remove('team')
 gk_stats.remove('position')
 
 # basic player info df for info card
-df_player_basic = df_player_misc[['birth_year', 'team', 'position']]
+df_player_basic = df_player_misc[['birth_year', 'team', 'position', 'minutes_90s']]
 
 # Globally Normalized Data
 # normalized_main_df = main_df.drop(["team"])#.apply(normalize_df)

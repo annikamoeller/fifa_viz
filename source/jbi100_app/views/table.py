@@ -37,6 +37,7 @@ class Table(html.Div):
                                     id=self.html_id,
                                     columns=[{'name': col, 'id': col} for col in df.columns],
                                     data=df.to_dict('records'),
+                                    sort_action = 'native',
                                     fixed_rows = {'headers': True},
                                     style_table={'height': '450px', 'color': '#ebebeb'},
                                     style_header={'backgroundColor': 'darkgrey', 'fontWeight': 'bold', 'fontSize': '14px', 'font-family': 'Arial'},
@@ -44,10 +45,10 @@ class Table(html.Div):
                                     #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
                                     style_data={'color': '#26232C'},
                                     style_cell_conditional=[
-                                    {'if': {'column_id': 'player'}, 'width': '40%'},
+                                    {'if': {'column_id': 'player'}, 'width': '35%'},
                                     {'if': {'column_id': self.selected_stat}, 'width': '20%'},
                                     {'if': {'column_id': 'team'}, 'width': '20%'},
-                                    {'if': {'column_id': 'position'}, 'width': '10%'}]
+                                    {'if': {'column_id': 'position'}, 'width': '15%'}]
                                     ),
                 style={'margin': 'auto', 'width': '100%', 'padding': 10}
             )
@@ -126,6 +127,10 @@ class Table(html.Div):
         columns=[{'name': col, 'id': col} for col in similar_player_df.columns]
 
         return similar_player_data, columns
+    
+    def sort_by_header(clicked_header):
+        print(clicked_header)
+        
     
     def set_clicked_cell(self, clicked_cell):
         self.clicked_cell = clicked_cell
