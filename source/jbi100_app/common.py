@@ -1,4 +1,6 @@
 import numpy as np
+import os 
+from IPython.display import Image
 
 """ This file is to store functions used in several places """
 
@@ -28,3 +30,17 @@ def normalize_df(column):
 def median_imputation_of_nan(col):
     col_median = np.median(col.dropna())
     return col.fillna(col_median) 
+
+def find_player(name, random_number):
+    main_path = '../Data/FIFA World Cup 2022 Player Images/Images/'
+    for group in os.listdir(main_path):
+        group_path = os.path.join(main_path, group)
+        for team in os.listdir(group_path):
+            team_path = os.path.join(group_path, team)
+            for player_name in os.listdir(team_path):
+                player_name_processed = player_name.split('_')[1].split('(')[0].strip()
+                # print(player_name_processed)
+                player_name_path = os.path.join(team_path, player_name)
+                if player_name_processed == name:
+                    img_path = os.path.join(player_name_path, f'{name}{random_number}.jpg')
+                    return Image(filename=img_path)
