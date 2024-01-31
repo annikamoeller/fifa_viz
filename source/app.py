@@ -276,7 +276,7 @@ if __name__ == '__main__':
     )
     def reset_table(n_clicks):
         if n_clicks not in [0, None]:
-            return None, [], radar_plot.update(False)
+            return None, [], radar_plot.update(False, None, None)
          
     #update the similar player heatmap
     @app.callback(
