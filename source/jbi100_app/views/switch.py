@@ -12,5 +12,5 @@ class Switch(html.Div):
         super().__init__(
             className="switch",
             children=
-                daq.BooleanSwitch(id="gk_switch", on=False, color="blue", label="Goalkeeper mode")
+                daq.BooleanSwitch(id="gk_switch", on=False, color="blue", label="Toggle goalkeeper mode")
         )

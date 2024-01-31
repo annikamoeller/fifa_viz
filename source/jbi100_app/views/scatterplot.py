@@ -67,17 +67,19 @@ class Scatterplot(html.Div):
         #Update the style and colors of the graph
         fig.update_layout(plot_bgcolor='#26232C',
             paper_bgcolor='#26232C',
-            title_font_color='white',
             legend_font_color='white',
             legend_title_font_color='white',
+            title = "Compare player statistics",
+            title_font_color = '#ebebeb', 
+            title_x = 0.5,
+            title_font_size = 20,
             xaxis = dict(
                 color="#9D9D9D",
-                title_font=dict(size=20, color='#9D9D9D')),
+                title_font=dict(size=15, color='#9D9D9D')),
             yaxis=dict(
                 color="#9D9D9D",
-                titlefont_size=16,
                 gridcolor='#9D9D9D',
-                title_font=dict(size=20, color='#9D9D9D'),
+                title_font=dict(size=15, color='#9D9D9D'),
             ))
         return fig
 

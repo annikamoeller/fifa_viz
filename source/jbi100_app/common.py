@@ -1,6 +1,8 @@
 import numpy as np
 import os 
 from IPython.display import Image
+from jbi100_app.config import *
+from sklearn.metrics.pairwise import cosine_similarity
 
 """ This file is to store functions used in several places """
 
@@ -30,3 +32,4 @@ def normalize_df(column):
 def median_imputation_of_nan(col):
     col_median = np.median(col.dropna())
     return col.fillna(col_median) 
+

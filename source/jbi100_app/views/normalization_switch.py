@@ -12,5 +12,5 @@ class NormalizationSwitch(html.Div):
         super().__init__(
             className="switch",
             children=
-                daq.BooleanSwitch(id="normalization_switch", on=False, color="blue", label="Normalize locally")
+                daq.BooleanSwitch(id="normalization_switch", on=False, color="blue", label="Normalize heatmap")
         )

@@ -104,7 +104,7 @@ df_attack['Goals per 90s'] = df_player_shooting['goals'] / df_player_shooting['m
 df_defense = pd.DataFrame()
 # df_defense['Player'] = df_player_defense.index
 # df_defense = df_defense.set_index('Player')
-df_defense['Tackle Succes'] = df_player_defense['tackles_won'] / df_player_defense['tackles']
+df_defense['Tackle Success'] = df_player_defense['tackles_won'] / df_player_defense['tackles']
 df_defense['Blocks per 90s'] = df_player_defense['blocks'] / df_player_defense['minutes_90s']
 df_defense['Clearances per 90s'] = df_player_defense['clearances'] / df_player_defense['minutes_90s']
 df_defense['Severe Error'] = df_player_defense['errors'] / df_player_defense['minutes_90s']
@@ -150,8 +150,6 @@ df_gk_hm_norm = df_gk_hm.apply(normalize_df)
 ## NAN-Filled Dataframes by median imputation. (main & gk)
 df_hm_filled = df_hm.apply(median_imputation_of_nan)
 df_gk_hm_filled = df_gk_hm.apply(median_imputation_of_nan)
-
-
 
 ######## Dataframe for radar plot
 minutes = df_player_stats['minutes_90s']
@@ -275,3 +273,25 @@ df_radar['Defense'] = df_radar_main.apply(get_defense_score, axis=1)
 df_radar['Control'] = df_radar_main.apply(get_control_score, axis=1)
 df_radar['Passing'] = df_radar_main.apply(get_passing_score, axis=1)
 df_radar['Discipline'] = df_radar_main.apply(get_discipline_score, axis=1)
+
+def get_similar_players(on, player, num_similar_players=5):
+    """
+    @player (str): the player for which we want similar players
+    @num_similar_players (str): the number of players that we want returned
+    @returns ->>> similar player data and columns for table
+    """
+    if on: df = df_gk_hm_filled
+    else: df = df_hm_filled
+
+    player = df.loc[player].values
+    player = player.reshape(1, -1)
+    df = df.dropna()
+
+    result = cosine_similarity(player, df)
+
+    result = np.array(result)
+    result = result.round(8)
+    x = np.argsort(result[0])[::-1][1:num_similar_players+1]
+    similar_player_df = df.iloc[x]
+    similar_player_df = similar_player_df.reset_index()
+    return similar_player_df

@@ -4,10 +4,6 @@ from ..config import *
 import plotly.express as px
 from dash import dash_table
 from ..common import *
-
-from sklearn.metrics import pairwise_distances
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 class Table(html.Div):
@@ -101,16 +97,8 @@ class Table(html.Div):
         @num_similar_players (str): the number of players that we want returned
         @returns ->>> similar player data and columns for table
         """
-        # if on: df = gk_df
-        # else: df = main_df
         if on: df = df_gk_hm_filled
         else: df = df_hm_filled
-
-        # cleanup_pos = {"position": {"GK": 1, "DF": 2, "MF": 3, "FW": 4}}
-        # df = df.replace(cleanup_pos)
-        # # df = df.drop(columns='team')
-        # if not on:
-        #     df = df.drop(columns='birth_year')
 
         player = df.loc[player].values
         player = player.reshape(1, -1)
@@ -125,10 +113,10 @@ class Table(html.Div):
         self.similar_players_df = similar_player_df
         similar_player_df = similar_player_df.reset_index()
 
-        similar_player_data = similar_player_df.to_dict('records')
-        columns=[{'name': col, 'id': col} for col in similar_player_df.columns]
+        # similar_player_data = similar_player_df.to_dict('records')
+        # columns=[{'name': col, 'id': col} for col in similar_player_df.columns]
 
-        return similar_player_data, columns
+        # return similar_player_data, columns
     
     def sort_by_header(clicked_header):
         print(clicked_header)

@@ -17,7 +17,7 @@ class Radar(html.Div):
             className="graph_card",
             children=
                 dcc.Graph(id=self.html_id,
-            style={'margin': 'auto', 'width': '100%', 'height': '600px', 'text-align': 'center', 'padding': 10})
+            style={'margin': 'auto', 'width': '100%', 'height': '450px', 'text-align': 'center', 'padding': 10})
         )
     
     def update(self, on, clickedPlayer=None, hoveredPlayer=None):
@@ -90,6 +90,14 @@ class Radar(html.Div):
             paper_bgcolor='#26232C',
             modebar_color = '#136d6d',
             showlegend=True,
+            legend_font_color = "#ebebeb",
+            legend_font_size = 13,
+            legend_title_side = 'top',
+            legend = dict(x=0, y=-0.2),
+            title = 'Summary statistics',
+            title_font_color = '#ebebeb', 
+            title_font_size = 20,
+            title_x = 0.5,
             polar=dict(
                 radialaxis=dict(
                 visible=True,

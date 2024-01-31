@@ -25,24 +25,23 @@ if __name__ == '__main__':
     """
     # goalkeeper mode switch
     gk_switch = Switch("gk_switch")
-
     # Table elements 
     player_data_table = Table("player_data_table", main_df, 'birth_year')
-    similar_player_table = Table("similar_player_table", None, 'birth_year')
+    #similar_player_table = Table("similar_player_table", None, 'birth_year')
     # drop downs 
     table_stat_dropdown = Dropdown("stat_dd", player_stats, player_stats[0], 'Select statistic')
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], None, 'Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_list, None, 'Filter by team', multiple_values=True)
     # group dropdowns together horizontally
-    table_dropdowns = html.Div([table_stat_dropdown, filter_team_dropdown,filter_position_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
+    table_dropdowns = html.Div([table_stat_dropdown, filter_team_dropdown,filter_position_dropdown], style={'display': 'flex', 'flexDirection': 'row', 'margin': 'auto' })
 
         #Reset button
-    reset_button = html.Div(html.Button(children='Reset', 
+    reset_button = html.Div(html.Button(children='Reset all plots', 
                                         id='reset_button', 
                                         n_clicks=0,
                                         style={'backgroundColor': 'white'}), 
                                         style={'text-align': 'center',
-                                               'padding-bottom': '3rem'} )
+                                               'padding-left': '3rem', 'padding-top': '1rem'} )
 
     # Scatter plot
     scatter_plot = Scatterplot("scatterplot", main_df, 'goals', 'goals')
@@ -77,15 +76,20 @@ if __name__ == '__main__':
     #when saving data in it, it must be serialized by using json.dumps(data)
     #when reading, we must decode by using json.loads(data)
     store = dcc.Store(id='highlighted-player-value')
-
+    gk_and_reset =  html.Div(id='gk_and_reset', children=[gk_switch, reset_button], style={'display': 'flex', 'flexDirection': 'row', 'justify-content': 'center', 'padding': '20px', 'margin': 'auto'})
     # Set up page on left and right
-    left_menu_plots = [gk_switch, table_dropdowns, player_data_table, reset_button, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_and_image, normalization_switch, heatmap_plot, store]
+    top_bar = [gk_and_reset]
+    #table_title = html.H5("this is my table", style={'text-align': 'center', 'font-family': 'arial', 'font-color': '#ebebeb', 'font-size': 20})
+
+    left_menu_plots = [table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
+    right_menu_plots = [normalization_switch, heatmap_plot, store, radar_plot, info_and_image]
 
     #Create left and right side of the page
     app.layout = html.Div(
         id="app-container",
         children=[
+            # Top bar
+            html.Div(id="top", className="top-bar", children = top_bar),
             # Left column
             html.Div(
                 id="left-column",
@@ -271,44 +275,29 @@ if __name__ == '__main__':
         if n_clicks not in [0, None]:
             return None, []
          
-    #update the similar player table and heatmap
+    #update the similar player heatmap
     @app.callback(
-            # Output(similar_player_table.html_id, 'data'),
-            # Output(similar_player_table.html_id, 'columns'),
             Output(heatmap_plot.html_id, 'figure'),
             Input(gk_switch.html_id, 'on'),
-            Input(player_data_table.html_id, 'data'),
-            Input(player_data_table.html_id, 'active_cell'),
-            Input(player_data_table.html_id, 'columns'),
             Input(normalization_switch.html_id, 'on'),
             Input('highlighted-player-value', 'data'),
             Input(scatter_plot.html_id, 'selectedData')
     )
-    def update_similar_players(goalkeeper_mode, data, clicked_cell, columns, local_normalization, highlight_player_data, selected_players_in_scatter_plot):
-        # Function partly broken, only updates heatmap when no players are selected in the scatterplot.
+    def update_similar_players(goalkeeper_mode, local_normalization, highlight_player_data, selected_players_in_scatter_plot):
         player = json.loads(highlight_player_data)
-
-        # if selected_players:
-        #     print('Players Selected')
-        #     players = [player['customdata'][0] for player in selected_players['points']]
-        #     new_heatmap = heatmap_plot.update(players, None, local_normalization)
-
-        new_data = []
-        columns = []
         new_heatmap = heatmap_plot.initial_heatmap(goalkeeper_mode=goalkeeper_mode)
 
         if player:
-            new_data, columns = similar_player_table.get_similar_players(goalkeeper_mode, player)
-            similar_players = similar_player_table.get_5_similar_players_df()
+            similar_players = get_similar_players(goalkeeper_mode, player)
+            similar_players = similar_players.set_index('player')
             similar_player_names = similar_players.index.tolist()
-            new_heatmap = heatmap_plot.update(goalkeeper_mode, similar_player_names, local_normalization)
-        
+            new_heatmap = heatmap_plot.update(goalkeeper_mode, player, similar_player_names, local_normalization)
         try:
             selected_names_in_scatter_plot = [player['customdata'][0] for player in selected_players_in_scatter_plot['points']]
             if not selected_names_in_scatter_plot:
                 pass
             else:
-                new_heatmap = heatmap_plot.update(goalkeeper_mode, selected_names_in_scatter_plot, local_normalization)
+                new_heatmap = heatmap_plot.update(goalkeeper_mode, player, selected_names_in_scatter_plot, local_normalization)
         except: 
             pass
 

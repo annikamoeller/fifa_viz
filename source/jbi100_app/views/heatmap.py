@@ -26,23 +26,23 @@ class Heatmap(html.Div):
         if max_val > 0: return column / max_val
         else: return column
 
-    def update(self, goalkeeper_mode, selected_player, local_normalization):
+    def update(self, goalkeeper_mode, player, similar_player_names, local_normalization):
         """ 
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
-
+        print(similar_player_names)
         if not goalkeeper_mode:
             if local_normalization:
-                normalized_df = df_hm.loc[selected_player].apply(self.normalize_using_max)
+                normalized_df = df_hm.loc[similar_player_names].apply(self.normalize_using_max)
             else:
-                normalized_df = df_hm_norm.loc[selected_player]
-            customdata_input = df_hm.loc[selected_player]
+                normalized_df = df_hm_norm.loc[similar_player_names]
+            customdata_input = df_hm.loc[similar_player_names]
         else: 
             if local_normalization:
-                normalized_df = df_gk_hm.loc[selected_player].apply(self.normalize_using_max)
+                normalized_df = df_gk_hm.loc[similar_player_names].apply(self.normalize_using_max)
             else:
-                normalized_df = df_gk_hm_norm.loc[selected_player]
-            customdata_input = df_gk_hm.loc[selected_player]
+                normalized_df = df_gk_hm_norm.loc[similar_player_names]
+            customdata_input = df_gk_hm.loc[similar_player_names]
 
         show_y_ticks = len(normalized_df) <= 9 # if more player are selected than the y axis can fit, dont show names.
 
@@ -57,7 +57,7 @@ class Heatmap(html.Div):
             hoverongaps = False,
             colorscale='Viridis'))
         
-        return self.update_heatmap_layout(fig, show_y_ticks)
+        return self.update_heatmap_layout(fig, player, show_y_ticks)
     
     def initial_heatmap(self, goalkeeper_mode=False):
         """
@@ -82,9 +82,9 @@ class Heatmap(html.Div):
             hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
             colorscale='Viridis'))
         
-        return self.update_heatmap_layout(fig, True)
+        return self.update_heatmap_layout(fig, None, True)
     
-    def update_heatmap_layout(self, fig, show_y_ticks):
+    def update_heatmap_layout(self, fig, player, show_y_ticks):
         """
         Updates a figures style
         @fig (figure): a graph figure to be updated
@@ -111,6 +111,12 @@ class Heatmap(html.Div):
             xaxis_title="Attributes",
             yaxis_title="Players"
             )
+        if player:
+            fig.update_layout(title = f"5 most similar players to {player}",
+                              title_font_color = '#ebebeb', title_x = 0.3)
+        else:
+            fig.update_layout(title = f"No player selected",
+                    title_font_color = '#ebebeb', title_x = 0.3)
         
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=False)

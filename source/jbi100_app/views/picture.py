@@ -45,4 +45,5 @@ class Picture(html.Div):
                                 if player_folder_no_Images_captain_or_accents == name_processed:
                                     img_path = os.path.join(player_name_path, f'{player_folder_no_Images_}{random_number}.jpg')
                                     pil_img = Image.open(img_path)
+                                    pil_img = pil_img.resize((230,200))
                                     return pil_img
