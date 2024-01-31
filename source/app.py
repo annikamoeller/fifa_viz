@@ -76,7 +76,9 @@ if __name__ == '__main__':
     #when saving data in it, it must be serialized by using json.dumps(data)
     #when reading, we must decode by using json.loads(data)
     store = dcc.Store(id='highlighted-player-value')
-    gk_mode_clicked_store = dcc.Store(id='gk_mode_clicked')
+    hovered_player_store = dcc.Store(id='hello')
+    toggle_store = dcc.Store(id = 'toggle-store', data = json.dumps(False))
+    previous_toggle_store = dcc.Store(id = 'previous-toggle-store', data=json.dumps(False))
 
     gk_and_reset =  html.Div(id='gk_and_reset', children=[gk_switch, reset_button], style={'display': 'flex', 'flexDirection': 'row', 'justify-content': 'center', 'padding': '20px', 'margin': 'auto'})
     # Set up page on left and right
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     #table_title = html.H5("this is my table", style={'text-align': 'center', 'font-family': 'arial', 'font-color': '#ebebeb', 'font-size': 20})
 
     left_menu_plots = [table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_and_image, normalization_switch, heatmap_plot, store]
+    right_menu_plots = [radar_plot, info_and_image, normalization_switch, heatmap_plot, store, toggle_store, previous_toggle_store]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -136,21 +138,39 @@ if __name__ == '__main__':
         Output(filter_position_dropdown.html_id, 'value'),
         Output(table_stat_dropdown.html_id, 'options'),
         Output(table_stat_dropdown.html_id, 'value'),
-        Input(gk_switch.html_id, 'on')
+        Output('toggle-store', 'data'),
+        Output('previous-toggle-store', 'data'),
+        Input(gk_switch.html_id, 'on'),
+        Input('previous-toggle-store', 'data')
     )
-    def toggle_gk_mode(on):
+    def toggle_gk_mode(on, previous_toggle_store):
         x_options, x_value = x_axis_dropdown.update(on)
         y_options, y_value = y_axis_dropdown.update(on)
         filter_options, filter_value = filter_position_dropdown.update(on)
         table_stat_options, table_stat_value = table_stat_dropdown.update(on)
-        return x_options, x_value, y_options, y_value, filter_options, filter_value, table_stat_options, table_stat_value
+        previous_toggle = json.loads(previous_toggle_store)
+
+        if on and not previous_toggle: 
+            toggled = True
+            previous_toggle_store = True
+        if not on and previous_toggle: 
+            toggled = True
+            previous_toggle_store = False
+        if not on and not previous_toggle: 
+            toggled = False
+            previous_toggle_store = False
+        if on and previous_toggle: 
+            toggled = False
+            previous_toggle_store = True
+        return x_options, x_value, y_options, y_value, filter_options, filter_value, table_stat_options, table_stat_value, json.dumps(toggled), json.dumps(previous_toggle_store)
 
     # update the scatter plot based on the x and y drop downs
     @app.callback(
         Output(scatter_plot.html_id, 'figure'),
         Output('highlighted-player-value', 'data'),
         Output(player_data_table.html_id, 'style_data_conditional'),
-        Output(player_data_table.html_id, 'active_cell'),
+        Output('toggle-store', 'data', allow_duplicate=True),
+        Input('toggle-store', 'data'),
         Input(gk_switch.html_id, 'on'),
         Input(scatter_plot.html_id, 'clickData'),
         Input(x_axis_dropdown.html_id, "value"),
@@ -161,11 +181,15 @@ if __name__ == '__main__':
         Input(player_data_table.html_id, 'data'),
         Input(player_data_table.html_id, "page_current"),
         Input(player_data_table.html_id, "page_size"),
-        Input(player_data_table.html_id, 'active_cell'))
-    def update_scatter(on, click, x_label, y_label, selected_stat, team_filter, position_filter, clicked_table_player_data, current_page, page_size, clicked_cell):
+        Input(player_data_table.html_id, 'active_cell'),
+        prevent_initial_call=True
+    )
+    def update_scatter(gk_toggled, on, click, x_label, y_label, selected_stat, team_filter, position_filter, clicked_table_player_data, current_page, page_size, clicked_cell):
         """
         Return a figure with a teams plot based on team dropdown value 
         """
+        gk_toggled = json.loads(gk_toggled)
+        scatter_plot.set_gk_toggled(gk_toggled)
         player = None
         blue_highlight_style = [
         {
@@ -205,11 +229,14 @@ if __name__ == '__main__':
             )
 
         #get the last clicked scatter and table clicked player 
-        if clicked_table_player_data and clicked_cell: 
+        if clicked_table_player_data and clicked_cell:
+            if gk_toggled:
+                clicked_cell['row'] = 0
             table_player = clicked_table_player_data[clicked_cell['row']+(current_page)*page_size]['player']
         else: table_player = None
         
-        if click: scatter_player = click['points'][0]['customdata'][0] #get click data
+        if click: 
+            scatter_player = click['points'][0]['customdata'][0] #get click data
         else: scatter_player = None
         #get the previously clicked players
         prev_table_click, prev_scatter_click = scatter_plot.get_click_player()
@@ -234,7 +261,9 @@ if __name__ == '__main__':
                                 or y_label != scatter_plot.y_axis_stat  \
                                 or team_filter != scatter_plot.team_filter \
                                 or position_filter != scatter_plot.position_filter:
-
+                if not table_player:
+                    scatter_plot.set_click_player(None, None)
+                else:
                     player = table_player
                     scatter_plot.set_click_player(table_player, None)
                     style = lightgrey_highlight_style.copy()
@@ -250,7 +279,9 @@ if __name__ == '__main__':
                 scatter_plot.set_click_player(table_player, scatter_player)
         else: 
             player = scatter_player
-        return scatter_plot.update(on, x_label, y_label, selected_stat, team_filter, position_filter, player), json.dumps(player), style, clicked_cell
+        if gk_toggled:
+            player = None
+        return scatter_plot.update(on, x_label, y_label, selected_stat, team_filter, position_filter, player), json.dumps(player), style, json.dumps(False)
     
     # update the table based on the drop downs
     @app.callback(
@@ -311,19 +342,26 @@ if __name__ == '__main__':
     Output(radar_plot.html_id, 'figure'),
     Input(scatter_plot.html_id, 'hoverData'),
     Input('highlighted-player-value', 'data'),
-    Input(gk_switch.html_id, 'on')
+    Input(gk_switch.html_id, 'on'),
+    Input('toggle-store', 'data')
     )
-    def selected_player(hover, highlight_player_data, on):
+    def selected_player(hover, highlight_player_data, on, toggle_store):
         """
         Get clicked, hovered player and stats dropdown value 
         return a radar figure with the stats of the selected players and dropdown
         """
+        toggled = scatter_plot.get_gk_toggled()
+
         highlight_player_data = json.loads(highlight_player_data)
 
-        if hover: hoveredPlayer = hover['points'][0]['customdata'][0] #get hover data
-        else: hoveredPlayer = None
+        if hover: hover_player = hover['points'][0]['customdata'][0] #get hover data
+        else: hover_player = None
 
-        return radar_plot.update(on, highlight_player_data, hoveredPlayer)
+        if toggled:
+            hover_player = None
+            scatter_plot.set_gk_toggled(False)
+            return radar_plot.clear(df_radar)
+        return radar_plot.update(on, highlight_player_data, hover_player)
 
     # update info card to display basic player info when clicked on in scatter plot 
     @app.callback(

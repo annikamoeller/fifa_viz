@@ -148,3 +148,9 @@ class Scatterplot(html.Div):
     
     def get_df(self):
         return self.df
+    
+    def set_gk_toggled(self, toggled):
+        self.toggled = toggled
+
+    def get_gk_toggled(self):
+        return self.toggled

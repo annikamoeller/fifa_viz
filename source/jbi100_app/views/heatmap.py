@@ -30,7 +30,6 @@ class Heatmap(html.Div):
         """ 
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
-        print(similar_player_names)
         if not goalkeeper_mode:
             if local_normalization:
                 normalized_df = df_hm.loc[similar_player_names].apply(self.normalize_using_max)
