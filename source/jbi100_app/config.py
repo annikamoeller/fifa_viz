@@ -274,6 +274,9 @@ df_radar['Passing'] = df_radar_main.apply(get_passing_score, axis=1)
 df_radar['Discipline'] = df_radar_main.apply(get_discipline_score, axis=1)
 
 ##Df for gk radar plot
+df_player_keepers.set_index('player', inplace=True)
+df_player_keepersadv.set_index('player', inplace=True)
+
 # gather useful statistics 
 #stopping
 gk_clean_sheets_pct = df_player_keepers['gk_clean_sheets_pct']
@@ -343,9 +346,9 @@ def get_kick_score(row):
 
 df_gk_radar['Stopping'] = main_gk_df.apply(get_stopping_score, axis=1)
 df_gk_radar['Defense'] = main_gk_df.apply(get_defense_score, axis=1)
-df_gk_radar['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
-df_gk_radar['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
 df_gk_radar['Kick'] = main_gk_df.apply(get_kick_score, axis=1)
+df_gk_radar['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
+df_gk_radar['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
 
 def get_similar_players(on, player, num_similar_players=5):
     """
