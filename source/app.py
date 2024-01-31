@@ -301,12 +301,13 @@ if __name__ == '__main__':
     @app.callback(
             Output(player_data_table.html_id, 'active_cell', allow_duplicate=True),
             Output(player_data_table.html_id, 'selected_cells', allow_duplicate=True),
+            Output(radar_plot.html_id, 'figure', allow_duplicate=True),
             Input('reset_button', 'n_clicks'),
             prevent_initial_call=True
     )
     def reset_table(n_clicks):
         if n_clicks not in [0, None]:
-            return None, []
+            return None, [], radar_plot.update(False, None, None)
          
     #update the similar player heatmap
     @app.callback(

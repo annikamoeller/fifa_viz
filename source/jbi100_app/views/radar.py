@@ -25,7 +25,7 @@ class Radar(html.Div):
         @clickedPlayer (str) = The clicked player name
         @hoveredPlayer (str) = The hovered player name
         """
-        if on: df = gk_df
+        if on: df = df_gk_radar
         else: df = self.df
 
         #If nothing is clicked or hovered create an empty radar
@@ -37,6 +37,7 @@ class Radar(html.Div):
 
         if clickedPlayer:
             player_values = df.loc[clickedPlayer].values
+            print(df_gk_radar.head(1))
 
             fig.add_trace(go.Scatterpolar(
                 r=player_values, #array of values for each label
