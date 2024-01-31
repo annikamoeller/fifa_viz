@@ -267,12 +267,85 @@ def get_discipline_score(row):
     return max(score, 0)
 
 
-# Applying the function to each row using apply with axis=1
 df_radar['Attack'] = df_radar_main.apply(get_attack_score, axis=1)
 df_radar['Defense'] = df_radar_main.apply(get_defense_score, axis=1)
 df_radar['Control'] = df_radar_main.apply(get_control_score, axis=1)
 df_radar['Passing'] = df_radar_main.apply(get_passing_score, axis=1)
 df_radar['Discipline'] = df_radar_main.apply(get_discipline_score, axis=1)
+
+##Df for gk radar plot
+# gather useful statistics 
+#stopping
+gk_clean_sheets_pct = df_player_keepers['gk_clean_sheets_pct']
+gk_save_pct = df_player_keepers['gk_save_pct']
+
+#defense
+gk_crosses_stopped_pct = df_player_keepersadv['gk_crosses_stopped_pct']
+gk_def_actions_outside_pen_area_per90 = df_player_keepersadv['gk_def_actions_outside_pen_area_per90']
+gk_avg_distance_def_actions = df_player_keepersadv['gk_avg_distance_def_actions']
+
+#penalty
+gk_pens_save_pct = df_player_keepers['gk_pens_save_pct']
+
+#passing
+gk_passes_pct_launched = df_player_keepersadv['gk_passes_pct_launched']
+gk_passes_length_avg  = df_player_keepersadv['gk_passes_length_avg']
+
+#kick
+gk_goal_kick_length_avg = df_player_keepersadv['gk_goal_kick_length_avg']
+gk_pct_goal_kicks_launched= df_player_keepersadv['gk_pct_goal_kicks_launched']
+
+
+
+
+# create main dataframe
+main_gk_df = pd.concat([position, minutes, appearances,
+                        gk_clean_sheets_pct, gk_save_pct,
+                        gk_crosses_stopped_pct, gk_def_actions_outside_pen_area_per90, gk_avg_distance_def_actions,
+                        gk_pens_save_pct,
+                        gk_passes_pct_launched, gk_passes_length_avg,
+                        gk_goal_kick_length_avg, gk_pct_goal_kicks_launched
+                     ], axis=1)
+main_gk_df = main_gk_df.drop(main_gk_df[main_gk_df['position'] != 'GK'].index)
+
+
+main_gk_df.replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+
+df_gk_radar = pd.DataFrame()
+
+def get_stopping_score(row):
+    return 2*row['gk_clean_sheets_pct']/100 + 3*row['gk_save_pct']/100
+
+def get_defense_score(row):
+    
+    score = (2*row['gk_crosses_stopped_pct']/100
+             + 2*row['gk_def_actions_outside_pen_area_per90']/df_player_keepersadv['gk_def_actions_outside_pen_area_per90'].max()
+             + row['gk_avg_distance_def_actions']/df_player_keepersadv['gk_avg_distance_def_actions'].max())
+
+    return score
+
+def get_penalty_score(row):
+    return 5*row['gk_pens_save_pct']/100
+
+def get_passing_score(row):
+
+    score = (row['gk_passes_length_avg']/df_player_keepersadv['gk_passes_length_avg'].max()
+             + 4*row['gk_passes_pct_launched']/100)
+
+    return score
+
+def get_kick_score(row):
+
+    score = (2*row['gk_goal_kick_length_avg']/df_player_keepersadv['gk_goal_kick_length_avg'].max()
+            + 3*row['gk_pct_goal_kicks_launched']/100)
+
+    return score
+
+df_gk_radar['Stopping'] = main_gk_df.apply(get_stopping_score, axis=1)
+df_gk_radar['Defense'] = main_gk_df.apply(get_defense_score, axis=1)
+df_gk_radar['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
+df_gk_radar['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
+df_gk_radar['Kick'] = main_gk_df.apply(get_kick_score, axis=1)
 
 def get_similar_players(on, player, num_similar_players=5):
     """
