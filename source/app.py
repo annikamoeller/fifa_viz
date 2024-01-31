@@ -29,9 +29,9 @@ if __name__ == '__main__':
     player_data_table = Table("player_data_table", main_df, 'birth_year')
     #similar_player_table = Table("similar_player_table", None, 'birth_year')
     # drop downs 
-    table_stat_dropdown = Dropdown("stat_dd", player_stats, player_stats[0], 'Select statistic')
-    filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], None, 'Filter by position', multiple_values=True)
-    filter_team_dropdown = Dropdown("team_dd", teams_list, None, 'Filter by team', multiple_values=True)
+    table_stat_dropdown = Dropdown("stat_dd", player_stats, startingValueNormal=player_stats[0], startingValueGk='gk_save_pct', label='Select statistic')
+    filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], label='Filter by position', multiple_values=True)
+    filter_team_dropdown = Dropdown("team_dd", teams_list, label= 'Filter by team', multiple_values=True)
     # group dropdowns together horizontally
     table_dropdowns = html.Div([table_stat_dropdown, filter_team_dropdown,filter_position_dropdown], style={'display': 'flex', 'flexDirection': 'row', 'margin': 'auto' })
 
@@ -47,8 +47,8 @@ if __name__ == '__main__':
     scatter_plot = Scatterplot("scatterplot", main_df, 'goals', 'goals')
     
     # drop downs for scatter plot 
-    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats, startingValue=player_stats[0], label='X-Axis Values')
-    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats, startingValue=player_stats[1], label='Y-Axis Values')
+    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats, startingValueNormal='birth_year', startingValueGk = 'gk_save_pct', label='X-Axis Values')
+    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats, startingValueNormal='tackles', startingValueGk = 'gk_passes_length_avg', label='Y-Axis Values')
     # group dropdowns together horizontally
     scatter_dropdowns = html.Div([x_axis_dropdown, y_axis_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
@@ -76,13 +76,15 @@ if __name__ == '__main__':
     #when saving data in it, it must be serialized by using json.dumps(data)
     #when reading, we must decode by using json.loads(data)
     store = dcc.Store(id='highlighted-player-value')
+    gk_mode_clicked_store = dcc.Store(id='gk_mode_clicked')
+
     gk_and_reset =  html.Div(id='gk_and_reset', children=[gk_switch, reset_button], style={'display': 'flex', 'flexDirection': 'row', 'justify-content': 'center', 'padding': '20px', 'margin': 'auto'})
     # Set up page on left and right
     top_bar = [gk_and_reset]
     #table_title = html.H5("this is my table", style={'text-align': 'center', 'font-family': 'arial', 'font-color': '#ebebeb', 'font-size': 20})
 
     left_menu_plots = [table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [normalization_switch, heatmap_plot, store, radar_plot, info_and_image]
+    right_menu_plots = [radar_plot, info_and_image, normalization_switch, heatmap_plot, store]
 
     #Create left and right side of the page
     app.layout = html.Div(

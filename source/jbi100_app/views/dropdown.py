@@ -3,7 +3,7 @@ from jbi100_app.config import *
 
 class Dropdown(html.Div):
  
-    def __init__(self, name, dropDownValues, startingValue=None, label=None, multiple_values=False):
+    def __init__(self, name, dropDownValues, startingValueNormal=None, startingValueGk=None, label=None, multiple_values=False):
         """
         Create a dropdown
         @name (str): name of the plot, used for html_id
@@ -14,7 +14,8 @@ class Dropdown(html.Div):
         """
         self.html_id = name.lower().replace(" ", "-")
         self.dropDownValues = dropDownValues
-
+        self.startingValueNormal = startingValueNormal
+        self.startingValueGk = startingValueGk
         # Equivalent to `html.Div([...])`
         super().__init__(
             className="graph_card",
@@ -24,7 +25,7 @@ class Dropdown(html.Div):
                 dcc.Dropdown(
                     id=self.html_id,
                     options=dropDownValues,
-                    value=startingValue,
+                    value=startingValueNormal,
                     multi=multiple_values
                 )
             ], style={'margin': 'auto', 'width': '25%', 'color': 'black', 'padding': 10} #Style of the dropdown
@@ -38,6 +39,6 @@ class Dropdown(html.Div):
                 return options, options
             else: return self.dropDownValues, None 
             
-        if on: return gk_stats, gk_stats[0]
-        else: return player_stats, player_stats[0]
+        if on: return gk_stats, self.startingValueGk 
+        else: return player_stats, self.startingValueNormal
         
