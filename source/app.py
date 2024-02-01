@@ -8,7 +8,6 @@ from jbi100_app.views.switch import *
 from jbi100_app.views.heatmap import *
 from jbi100_app.views.infoCard import *
 from jbi100_app.views.table import *
-from jbi100_app.views.normalization_switch import *
 from jbi100_app.views.picture import *
 
 from jbi100_app.views.multival_dropdown import *
@@ -68,7 +67,6 @@ if __name__ == '__main__':
     # radar_and_info = html.Div([radar_plot, info_card1], style={'display': 'flex', 'flexDirection': 'row'})
 
     # Heatmap plot
-    normalization_switch = NormalizationSwitch('normalization_switch')
     heatmap_plot = Heatmap("heatmap_plot", radar_df)
 
     #this variable is used for many callbacks and it represents the highlighted player
@@ -85,7 +83,7 @@ if __name__ == '__main__':
     #table_title = html.H5("this is my table", style={'text-align': 'center', 'font-family': 'arial', 'font-color': '#ebebeb', 'font-size': 20})
 
     left_menu_plots = [table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [normalization_switch, heatmap_plot, info_and_image, radar_plot,store, toggle_store, previous_toggle_store]
+    right_menu_plots = [heatmap_plot, info_and_image, radar_plot,store, toggle_store, previous_toggle_store]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -313,11 +311,10 @@ if __name__ == '__main__':
     @app.callback(
             Output(heatmap_plot.html_id, 'figure'),
             Input(gk_switch.html_id, 'on'),
-            Input(normalization_switch.html_id, 'on'),
             Input('highlighted-player-value', 'data'),
             Input(scatter_plot.html_id, 'selectedData')
     )
-    def update_similar_players(goalkeeper_mode, local_normalization, highlight_player_data, selected_players_in_scatter_plot):
+    def update_similar_players(goalkeeper_mode, highlight_player_data, selected_players_in_scatter_plot):
         player = json.loads(highlight_player_data)
         new_heatmap = heatmap_plot.initial_heatmap(goalkeeper_mode=goalkeeper_mode)
 
@@ -325,13 +322,13 @@ if __name__ == '__main__':
             similar_players = get_similar_players(goalkeeper_mode, player)
             similar_players = similar_players.set_index('player')
             similar_player_names = similar_players.index.tolist()
-            new_heatmap = heatmap_plot.update(goalkeeper_mode, player, similar_player_names, local_normalization)
+            new_heatmap = heatmap_plot.update(goalkeeper_mode, player, similar_player_names)
         try:
             selected_names_in_scatter_plot = [player['customdata'][0] for player in selected_players_in_scatter_plot['points']]
             if not selected_names_in_scatter_plot:
                 pass
             else:
-                new_heatmap = heatmap_plot.update(goalkeeper_mode, player, selected_names_in_scatter_plot, local_normalization)
+                new_heatmap = heatmap_plot.update(goalkeeper_mode, player, selected_names_in_scatter_plot)
         except: 
             pass
 

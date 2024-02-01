@@ -76,7 +76,7 @@ class Table(html.Div):
         """
         if on: 
             position_filter = ['GK']
-            df = gk_df
+            df = main_gk_df
         else: df = main_df
             
         df = df.reset_index()
@@ -97,8 +97,8 @@ class Table(html.Div):
         @num_similar_players (str): the number of players that we want returned
         @returns ->>> similar player data and columns for table
         """
-        if on: df = df_gk_hm_filled
-        else: df = df_hm_filled
+        if on: df = radar_gk_df
+        else: df = radar_df
 
         player = df.loc[player].values
         player = player.reshape(1, -1)

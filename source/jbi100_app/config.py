@@ -92,24 +92,6 @@ red_cards = df_player_stats['cards_red']
 minutes_90s= df_player_stats['minutes_90s']
 
 
-'''
-#Per 90s statistics
-goals_90s = goals/minutes_90s
-blocks_90s = blocks/minutes_90s
-clearances_90s = clearances/minutes_90s
-severe_error = errors/minutes_90s
-touches_90s = touches/minutes_90s
-miscontrols_90s = miscontrols/minutes_90s
-dispossessed_90s = dispossessed/minutes_90s
-
-#Ratios
-tackle_success = tackles_won/tackles
-'''
-
-'''
-df_attack['Shot Accuracy'] = df_player_shooting['shots_on_target'] / df_player_shooting['shots']
-'''
-
 ############
 
 ##### INFO CARD DF#####
@@ -236,50 +218,7 @@ radar_df['Passing'] = aux_radar_df.apply(get_passing_score, axis=1)
 radar_df['Discipline'] = aux_radar_df.apply(get_discipline_score, axis=1)
 
 
-##########################################################FUCKING GK#############################################################
-
-
-'''
-# create goalkeeper df
-gk_df = pd.merge(df_player_keepers[['player', 'team', 'position', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
-gk_df = gk_df.set_index('player')
-# statistics for table drop down
-gk_stats = list(gk_df.columns)
-gk_stats.remove('team')
-gk_stats.remove('position')
-
-
-
-
-
-#Goalkeeper Dataframe for the Heatmap
-df_keepers = df_player_keepers[['player', 'gk_goals_against_per90', 'gk_save_pct', 'gk_clean_sheets_pct', 'gk_pens_save_pct']]
-df_keepers.set_index('player', inplace=True)
-
-df_keepersadv = df_player_keepersadv[['player', 'gk_passes_pct_launched', 'gk_passes_length_avg', 'gk_crosses_stopped_pct']]
-df_keepersadv.set_index('player', inplace=True)
-
-df_gk_hm = pd.concat([df_keepers, df_keepersadv], axis=1)
-df_gk_hm.fillna(0, inplace=True)
-
-df_gk_hm.rename(columns={'gk_goals_against_per90':'Goals conceded per 90s',
-                         'gk_save_pct':'Goals saved percentage',
-                         'gk_clean_sheets_pct':'Clean sheets percentage',
-                         'gk_pens_save_pct': 'Penalty save percentage',
-                         'gk_passes_pct_launched':'Percentage of successful passes',
-                         'gk_passes_length_avg':'Average pass lenght',
-                        'gk_crosses_stopped_pct':'Stopped crosses percentage' }, inplace=True)
-
-df_gk_hm_norm = df_gk_hm.apply(normalize_df)
-
-df_gk_hm_filled = df_gk_hm.apply(median_imputation_of_nan)
-
-
-
-
-##Df for gk radar plot
-df_player_keepers.set_index('player', inplace=True)
-df_player_keepersadv.set_index('player', inplace=True)
+###### Gk Dfs######
 
 # gather useful statistics 
 #stopping
@@ -303,10 +242,8 @@ gk_goal_kick_length_avg = df_player_keepersadv['gk_goal_kick_length_avg']
 gk_pct_goal_kicks_launched= df_player_keepersadv['gk_pct_goal_kicks_launched']
 
 
-
-
 # create main dataframe
-main_gk_df = pd.concat([position, minutes, appearances,
+main_gk_df = pd.concat([position, team, minutes_90s, appearances,
                         gk_clean_sheets_pct, gk_save_pct,
                         gk_crosses_stopped_pct, gk_def_actions_outside_pen_area_per90, gk_avg_distance_def_actions,
                         gk_pens_save_pct,
@@ -318,7 +255,12 @@ main_gk_df = main_gk_df.drop(main_gk_df[main_gk_df['position'] != 'GK'].index)
 
 main_gk_df.replace([np.inf, -np.inf, np.nan], 0, inplace=True)
 
-df_gk_radar = pd.DataFrame()
+# statistics for table drop down
+gk_stats = list(main_gk_df.columns)
+gk_stats.remove('team')
+gk_stats.remove('position')
+
+radar_gk_df = pd.DataFrame()
 
 def get_stopping_score(row):
     return 2*row['gk_clean_sheets_pct']/100 + 3*row['gk_save_pct']/100
@@ -348,13 +290,13 @@ def get_kick_score(row):
 
     return score
 
-df_gk_radar['Stopping'] = main_gk_df.apply(get_stopping_score, axis=1)
-df_gk_radar['Defense'] = main_gk_df.apply(get_defense_score, axis=1)
-df_gk_radar['Kick'] = main_gk_df.apply(get_kick_score, axis=1)
-df_gk_radar['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
-df_gk_radar['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
+radar_gk_df['Stopping'] = main_gk_df.apply(get_stopping_score, axis=1)
+radar_gk_df['Defense'] = main_gk_df.apply(get_defense_score, axis=1)
+radar_gk_df['Kick'] = main_gk_df.apply(get_kick_score, axis=1)
+radar_gk_df['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
+radar_gk_df['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
 
-'''
+
 #################################################FUCKING GK END #####################################################
 
 def get_similar_players(on, player, num_similar_players=5):
@@ -363,7 +305,7 @@ def get_similar_players(on, player, num_similar_players=5):
     @num_similar_players (str): the number of players that we want returned
     @returns ->>> similar player data and columns for table
     """
-    if on: df = radar_df
+    if on: df = radar_gk_df
     else: df = radar_df
 
     player = df.loc[player].values

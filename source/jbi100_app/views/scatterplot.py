@@ -43,7 +43,7 @@ class Scatterplot(html.Div):
         @position_filter (str): playing position to filter by
         @returns ->>> figure class with new plot
         """
-        if on: df = gk_df.reset_index()
+        if on: df = main_gk_df.reset_index()
         else: df = main_df.reset_index()
 
         self.x_axis_stat = x_axis_stat

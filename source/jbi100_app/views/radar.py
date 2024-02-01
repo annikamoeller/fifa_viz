@@ -25,7 +25,7 @@ class Radar(html.Div):
         @clickedPlayer (str) = The clicked player name
         @hoveredPlayer (str) = The hovered player name
         """
-        if on: df = df_gk_radar
+        if on: df = radar_gk_df
         else: df = self.df
 
         #If nothing is clicked or hovered create an empty radar
