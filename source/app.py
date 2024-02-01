@@ -85,7 +85,7 @@ if __name__ == '__main__':
     #table_title = html.H5("this is my table", style={'text-align': 'center', 'font-family': 'arial', 'font-color': '#ebebeb', 'font-size': 20})
 
     left_menu_plots = [table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [normalization_switch, heatmap_plot, radar_plot, info_and_image, store, toggle_store, previous_toggle_store]
+    right_menu_plots = [normalization_switch, heatmap_plot, info_and_image, radar_plot,store, toggle_store, previous_toggle_store]
 
     #Create left and right side of the page
     app.layout = html.Div(
@@ -361,7 +361,7 @@ if __name__ == '__main__':
         if toggled:
             hover_player = None
             scatter_plot.set_gk_toggled(False)
-            return radar_plot.clear(df_radar)
+            return radar_plot.clear(radar_df)
         return radar_plot.update(on, highlight_player_data, hover_player)
 
     # update info card to display basic player info when clicked on in scatter plot 

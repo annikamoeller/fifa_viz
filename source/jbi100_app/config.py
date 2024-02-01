@@ -113,7 +113,7 @@ df_attack['Shot Accuracy'] = df_player_shooting['shots_on_target'] / df_player_s
 ############
 
 ##### INFO CARD DF#####
-df_player_basic = pd.concat([birth_year, team, position, minutes_90s])
+df_player_basic = pd.concat([birth_year, team, position, minutes_90s],axis=1)
 
 
 ##### MAIN DF #####
@@ -363,8 +363,8 @@ def get_similar_players(on, player, num_similar_players=5):
     @num_similar_players (str): the number of players that we want returned
     @returns ->>> similar player data and columns for table
     """
-    if on: df = df_gk_hm_filled
-    else: df = df_hm_filled
+    if on: df = radar_df
+    else: df = radar_df
 
     player = df.loc[player].values
     player = player.reshape(1, -1)
