@@ -26,22 +26,15 @@ class Heatmap(html.Div):
         if max_val > 0: return column / max_val
         else: return column
 
-    def update(self, goalkeeper_mode, player, similar_player_names, local_normalization):
+    def update(self, goalkeeper_mode, player, similar_player_names):
         """ 
         @similar_players_df List(str): dataframe from get_similar_players in table.py
         """
-        if not goalkeeper_mode:
-            if local_normalization:
-                normalized_df = self.df.loc[similar_player_names].apply(self.normalize_using_max)
-            else:
-                normalized_df = self.df.loc[similar_player_names]
-            customdata_input = self.df.loc[similar_player_names]
-        else: 
-            if local_normalization:
-                normalized_df = self.df.loc[similar_player_names].apply(self.normalize_using_max)
-            else:
-                normalized_df = self.df.loc[similar_player_names]
-            customdata_input = self.df.loc[similar_player_names]
+        if goalkeeper_mode: self.df = radar_gk_df
+        else: self.df = radar_df
+        
+        normalized_df = self.df.loc[similar_player_names]
+        customdata_input = self.df.loc[similar_player_names]
 
         show_y_ticks = len(normalized_df) <= 9 # if more player are selected than the y axis can fit, dont show names.
 
@@ -63,12 +56,11 @@ class Heatmap(html.Div):
         Creates a basic heatmap with the top 5 values from main_df
         @return (figure) created heatmap figure
         """
-        if goalkeeper_mode:
-            first_five_values_df = self.df.head(5)
-            customdata_input = self.df.head()
-        else:
-            first_five_values_df = self.df.head(5)
-            customdata_input = self.df.head()
+        if goalkeeper_mode: self.df = radar_gk_df
+        else: self.df = radar_df
+            
+        first_five_values_df = self.df.head(5)
+        customdata_input = self.df.head()
 
         fig = go.Figure()
 
