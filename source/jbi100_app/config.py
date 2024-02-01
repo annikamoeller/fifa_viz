@@ -119,7 +119,8 @@ df_player_basic = pd.concat([birth_year, team, position, minutes_90s])
 ##### MAIN DF #####
 main_df = pd.concat([goals, xg, birth_year, assists, appearances, yellow_cards, red_cards, passes, touches, shots,
                      offsides, tackles, fouls, dispossessed, own_goals, clearances, position, team, shot_creating_actions, goal_creating_actions,
-                     tackles, blocks, miscontrols])
+                    blocks, miscontrols], axis=1)
+print(main_df.head())
 
 #Drop goalkeepers
 main_df = main_df.drop(main_df[main_df['position'] == 'GK'].index)
@@ -129,16 +130,15 @@ main_df.fillna('No data')
 
 
 ##### MAIN DF 90S ######
-main_df_90s = pd.DataFrame()
-main_df_90s['player'] = main_df['player']
+main_df_90s = pd.DataFrame(index=main_df.index)
 
 for column in main_df.columns:
-    if column not in ['player', 'xg', 'birth_year', 'position', 'team']:
+    if column not in ['xg', 'birth_year', 'position', 'team']:
         main_df_90s[column + ' per 90s'] = main_df[column]/minutes_90s
 
 
 ##### TABLE DF #####
-table_df = pd.concat(main_df, main_df_90s)
+table_df = pd.concat([main_df, main_df_90s], axis=1)
 
 
 # teams for table drop down

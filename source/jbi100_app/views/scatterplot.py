@@ -31,7 +31,7 @@ class Scatterplot(html.Div):
             className="graph_card",
             children=
                 dcc.Graph(id=self.html_id, figure=self.update_layout(self.initial_plot),
-            style={'margin': 'auto', 'width': '100%', 'height': 600, 'padding': 10})
+            style={'margin': 'auto', 'width': '100%', 'height': 700, 'padding': 0})
         )
 
     def update(self, on, x_axis_stat, y_axis_stat, selected_stat, team_filter, position_filter, player):

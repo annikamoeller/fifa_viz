@@ -1,6 +1,5 @@
 from jbi100_app.main import app
 from jbi100_app.views.menu import *
-from jbi100_app.views.field import *
 from jbi100_app.config import *
 from jbi100_app.views.dropdown import *
 from jbi100_app.views.radar import *
@@ -86,7 +85,7 @@ if __name__ == '__main__':
     #table_title = html.H5("this is my table", style={'text-align': 'center', 'font-family': 'arial', 'font-color': '#ebebeb', 'font-size': 20})
 
     left_menu_plots = [table_dropdowns, player_data_table, scatter_dropdowns, scatter_plot]
-    right_menu_plots = [radar_plot, info_and_image, normalization_switch, heatmap_plot, store, toggle_store, previous_toggle_store]
+    right_menu_plots = [normalization_switch, heatmap_plot, radar_plot, info_and_image, store, toggle_store, previous_toggle_store]
 
     #Create left and right side of the page
     app.layout = html.Div(
