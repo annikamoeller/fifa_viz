@@ -111,15 +111,16 @@ class Scatterplot(html.Div):
                     #hence, changing the color of idx=0 also changes the label color
                     x = trace.x
                     y = trace.y
-                    player_name = trace.customdata
+                    player_name = trace.customdata.T
 
-                    x[0], x[1] = x[0], x[1]
-                    y[0], y[1] = y[0], y[1]
+                    temp = x[1], y[1]
+                    x[1], y[1] = x[0], y[0]
+                    x[0], y[0] = temp
 
-                    selected = player_name[0]
-                    switch = player_name[1]
-                    player_name[1] = selected
-                    player_name[0] = switch
+                    selected = player_name[0][0]
+                    switch = player_name[0][1]
+                    player_name[0][1] = selected
+                    player_name[0][0] = switch
 
                     idx = 1
 

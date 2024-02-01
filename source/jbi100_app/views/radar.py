@@ -37,7 +37,6 @@ class Radar(html.Div):
 
         if clickedPlayer:
             player_values = df.loc[clickedPlayer].values
-            print(df_gk_radar.head(1))
 
             fig.add_trace(go.Scatterpolar(
                 r=player_values, #array of values for each label

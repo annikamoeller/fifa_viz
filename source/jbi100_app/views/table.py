@@ -117,11 +117,7 @@ class Table(html.Div):
         # columns=[{'name': col, 'id': col} for col in similar_player_df.columns]
 
         # return similar_player_data, columns
-    
-    def sort_by_header(clicked_header):
-        print(clicked_header)
         
-    
     def set_clicked_cell(self, clicked_cell):
         self.clicked_cell = clicked_cell
 

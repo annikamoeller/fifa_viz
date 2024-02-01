@@ -230,9 +230,10 @@ if __name__ == '__main__':
 
         #get the last clicked scatter and table clicked player 
         if clicked_table_player_data and clicked_cell:
-            if gk_toggled:
-                clicked_cell['row'] = 0
-            table_player = clicked_table_player_data[clicked_cell['row']+(current_page)*page_size]['player']
+            try:
+                table_player = clicked_table_player_data[clicked_cell['row']+(current_page)*page_size]['player']
+            except: 
+                table_player = None
         else: table_player = None
         
         if click: 
