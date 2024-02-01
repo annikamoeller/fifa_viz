@@ -52,7 +52,7 @@ if __name__ == '__main__':
     scatter_dropdowns = html.Div([x_axis_dropdown, y_axis_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
     # Radar plot
-    radar_plot = Radar("radar", df_radar)
+    radar_plot = Radar("radar", radar_df)
 
     # player 1 info card
     
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     # Heatmap plot
     normalization_switch = NormalizationSwitch('normalization_switch')
-    heatmap_plot = Heatmap("heatmap_plot", df_hm)
+    heatmap_plot = Heatmap("heatmap_plot", radar_df)
 
     #this variable is used for many callbacks and it represents the highlighted player
     #when saving data in it, it must be serialized by using json.dumps(data)

@@ -156,6 +156,19 @@ player_stats = sorted(player_stats)
 
 radar_df = pd.DataFrame()
 
+# create main dataframe
+aux_radar_df = pd.concat([position, minutes_90s,
+                     goals, shots_on_target_pct, goals_per_shot, average_shot_distance,pens_made,pens_att,
+                     tackles,tackles_won, clearances, blocks, errors,
+                     touches, dispossessed, aerials_won_pct, dribbles_completed_pct, passes_received, miscontrols,
+                     assists, passes_pct, passes_total_distance, passes_pct_long, progressive_passes,
+                     red_cards, yellow_cards, fouls
+                     ], axis=1)
+aux_radar_df = aux_radar_df.drop(aux_radar_df[aux_radar_df['position'] == 'GK'].index)
+
+
+aux_radar_df.replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+
 def get_attack_score(row):
     if (row['pens_att'] == 0): pens = 0
     else: pens = row['pens_made'] / row['pens_att']
@@ -216,17 +229,17 @@ def get_discipline_score(row):
     return max(score, 0)
 
 
-radar_df['Attack'] = table_df.replace([np.inf, -np.inf, np.nan], 0).apply(get_attack_score, axis=1)
-radar_df['Defense'] = table_df.replace([np.inf, -np.inf, np.nan], 0).apply(get_defense_score, axis=1)
-radar_df['Control'] = table_df.replace([np.inf, -np.inf, np.nan], 0).apply(get_control_score, axis=1)
-radar_df['Passing'] = table_df.replace([np.inf, -np.inf, np.nan], 0).apply(get_passing_score, axis=1)
-radar_df['Discipline'] = table_df.replace([np.inf, -np.inf, np.nan], 0).apply(get_discipline_score, axis=1)
+radar_df['Attack'] = aux_radar_df.apply(get_attack_score, axis=1)
+radar_df['Defense'] = aux_radar_df.apply(get_defense_score, axis=1)
+radar_df['Control'] = aux_radar_df.apply(get_control_score, axis=1)
+radar_df['Passing'] = aux_radar_df.apply(get_passing_score, axis=1)
+radar_df['Discipline'] = aux_radar_df.apply(get_discipline_score, axis=1)
 
 
 ##########################################################FUCKING GK#############################################################
 
 
-
+'''
 # create goalkeeper df
 gk_df = pd.merge(df_player_keepers[['player', 'team', 'position', 'gk_save_pct', 'gk_pens_save_pct']], df_player_keepersadv[['player', 'gk_passes_length_avg', 'gk_goal_kick_length_avg']], on='player', how='inner')
 gk_df = gk_df.set_index('player')
@@ -341,7 +354,7 @@ df_gk_radar['Kick'] = main_gk_df.apply(get_kick_score, axis=1)
 df_gk_radar['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
 df_gk_radar['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
 
-
+'''
 #################################################FUCKING GK END #####################################################
 
 def get_similar_players(on, player, num_similar_players=5):

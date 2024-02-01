@@ -32,16 +32,16 @@ class Heatmap(html.Div):
         """
         if not goalkeeper_mode:
             if local_normalization:
-                normalized_df = df_hm.loc[similar_player_names].apply(self.normalize_using_max)
+                normalized_df = self.df.loc[similar_player_names].apply(self.normalize_using_max)
             else:
-                normalized_df = df_hm_norm.loc[similar_player_names]
-            customdata_input = df_hm.loc[similar_player_names]
+                normalized_df = self.df.loc[similar_player_names]
+            customdata_input = self.df.loc[similar_player_names]
         else: 
             if local_normalization:
-                normalized_df = df_gk_hm.loc[similar_player_names].apply(self.normalize_using_max)
+                normalized_df = self.df.loc[similar_player_names].apply(self.normalize_using_max)
             else:
-                normalized_df = df_gk_hm_norm.loc[similar_player_names]
-            customdata_input = df_gk_hm.loc[similar_player_names]
+                normalized_df = self.df.loc[similar_player_names]
+            customdata_input = self.df.loc[similar_player_names]
 
         show_y_ticks = len(normalized_df) <= 9 # if more player are selected than the y axis can fit, dont show names.
 
@@ -64,11 +64,11 @@ class Heatmap(html.Div):
         @return (figure) created heatmap figure
         """
         if goalkeeper_mode:
-            first_five_values_df = df_gk_hm_norm.head(5)
-            customdata_input = df_gk_hm.head()
+            first_five_values_df = self.df.head(5)
+            customdata_input = self.df.head()
         else:
-            first_five_values_df = df_hm_norm.head(5)
-            customdata_input = df_hm.head()
+            first_five_values_df = self.df.head(5)
+            customdata_input = self.df.head()
 
         fig = go.Figure()
 
