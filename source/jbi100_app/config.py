@@ -116,7 +116,7 @@ main_df_90s_scatter = pd.DataFrame(index=main_df.index)
 
 for column in main_df.columns:
     if column not in ['xg', 'birth_year', 'position', 'team']:
-        main_df_90s[column + ' per 90s'] = round(main_df[column]/minutes_90s,1)
+        main_df_90s[column + '/game'] = round(main_df[column]/minutes_90s,1)
 
 main_df_90s_scatter = pd.concat([main_df_90s,xg,position,team], axis=1)
 
