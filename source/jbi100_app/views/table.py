@@ -21,7 +21,7 @@ class Table(html.Div):
             df = df.reset_index()
             self.selected_stat = selected_stat
             print(selected_stat)
-            self.selected_stat_90s = f"{selected_stat} per 90s"
+            self.selected_stat_90s = f"{selected_stat}/game"
             print(self.selected_stat_90s)
             try:
                 df = df[['player', self.selected_stat, self.selected_stat_90s, 'team', 'position']]

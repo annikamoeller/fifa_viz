@@ -18,7 +18,7 @@ def filter_df(df, team_filter, position_filter):
 
 def rank_df(df, selected_stat):
     #df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
-    selected_stat_90s = f"{selected_stat} per 90s"
+    selected_stat_90s = f"{selected_stat}/game"
     try:
         df = df[['player', selected_stat, selected_stat_90s, 'team', 'position']]
     except:

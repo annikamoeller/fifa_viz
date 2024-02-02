@@ -35,7 +35,7 @@ if __name__ == '__main__':
     table_dropdowns = html.Div([table_stat_dropdown, filter_team_dropdown,filter_position_dropdown], style={'display': 'flex', 'flexDirection': 'row', 'margin': 'auto' })
 
         #Reset button
-    reset_button = html.Div(html.Button(children='Reset all plots', 
+    reset_button = html.Div(html.Button(children='Reset selected player', 
                                         id='reset_button', 
                                         n_clicks=0,
                                         style={'backgroundColor': 'white'}), 
