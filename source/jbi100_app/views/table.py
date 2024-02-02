@@ -20,9 +20,17 @@ class Table(html.Div):
         if df is not None:
             df = df.reset_index()
             self.selected_stat = selected_stat
-            df = df[['player', self.selected_stat, 'team', 'position']]
-            df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
-            df = df[['rank', 'player', 'team', selected_stat, 'position']]
+            print(selected_stat)
+            self.selected_stat_90s = f"{selected_stat} per 90s"
+            print(self.selected_stat_90s)
+            try:
+                df = df[['player', self.selected_stat, self.selected_stat_90s, 'team', 'position']]
+            except:
+                print("not 90s")
+                df = df[['player', self.selected_stat, 'team', 'position']]
+
+            #df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
+            df = df[['player', 'team', self.selected_stat, self.selected_stat_90s, 'position']]
             df = df.sort_values(by=selected_stat, ascending=False)
 
             # Main table
@@ -43,28 +51,13 @@ class Table(html.Div):
                                     #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
                                     style_data={'color': '#26232C'},
                                     style_cell_conditional=[
-                                    {'if': {'column_id': 'player'}, 'width': '35%'},
+                                    {'if': {'column_id': 'player'}, 'width': '30%'},
                                     {'if': {'column_id': self.selected_stat}, 'width': '20%'},
-                                    {'if': {'column_id': 'team'}, 'width': '20%'},
-                                    {'if': {'column_id': 'position'}, 'width': '15%'}]
+                                    {'if': {'column_id': 'team'}, 'width': '15%'},
+                                    {'if': {'column_id': 'position'}, 'width': '12.5%'}, 
+                                    {'if': {'column_id': self.selected_stat_90s}, 'width': '12.5%'}]
                                     ),
                 style={'margin': 'auto', 'width': '100%', 'padding': 10}
-            )
-
-        else:
-            # Just an empty table for now.
-            super().__init__(
-                className="graph_card",
-                children=[
-                    dash_table.DataTable(
-                                    id=self.html_id,
-                                    columns=[],
-                                    style_table={'overflowY': 'scroll'},
-                                    style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
-                                    #style_cell={'minWidth': 100, 'width': 100, 'maxWidth': 100, 'overflow': 'hidden', 'textOverflow': 'ellipsis'},
-                                    style_data={'color': 'black'}
-                                    )],
-                style={'margin': 'auto', 'width': '80%', 'padding': 10}
             )
     
     def update(self, selected_stat, on, team_filter=None, position_filter=None):
@@ -77,7 +70,7 @@ class Table(html.Div):
         if on: 
             position_filter = ['GK']
             df = main_gk_df
-        else: df = main_df
+        else: df = table_df
             
         df = df.reset_index()
         df = filter_df(df, team_filter, position_filter)

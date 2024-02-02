@@ -39,6 +39,6 @@ class Dropdown(html.Div):
                 return options, options
             else: return self.dropDownValues, None 
             
-        if on: return gk_stats, self.startingValueGk 
-        else: return player_stats, self.startingValueNormal
+        if on: return self.dropDownValues, self.startingValueGk 
+        else: return self.dropDownValues, self.startingValueNormal
         

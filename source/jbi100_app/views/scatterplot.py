@@ -23,7 +23,7 @@ class Scatterplot(html.Div):
         self.y_axis_stat = y_axis_stat
         self.df = df
         
-        df = main_df.reset_index()
+        df = main_df_90s_scatter.reset_index()
         self.initial_plot = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
         
         # Equivalent to `html.Div([...])`
@@ -44,7 +44,7 @@ class Scatterplot(html.Div):
         @returns ->>> figure class with new plot
         """
         if on: df = main_gk_df.reset_index()
-        else: df = main_df.reset_index()
+        else: df = main_df_90s_scatter.reset_index()
 
         self.x_axis_stat = x_axis_stat
         self.y_axis_stat = y_axis_stat

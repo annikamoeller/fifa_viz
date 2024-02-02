@@ -24,10 +24,11 @@ if __name__ == '__main__':
     # goalkeeper mode switch
     gk_switch = Switch("gk_switch")
     # Table elements 
-    player_data_table = Table("player_data_table", main_df, 'birth_year')
+    player_data_table = Table("player_data_table", table_df, 'assists')
     #similar_player_table = Table("similar_player_table", None, 'birth_year')
     # drop downs 
     table_stat_dropdown = Dropdown("stat_dd", player_stats, startingValueNormal=player_stats[0], startingValueGk='gk_save_pct', label='Select statistic')
+    print(player_stats)
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], label='Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_list, label= 'Filter by team', multiple_values=True)
     # group dropdowns together horizontally
@@ -42,11 +43,11 @@ if __name__ == '__main__':
                                                'padding-left': '3rem', 'padding-top': '1rem'} )
 
     # Scatter plot
-    scatter_plot = Scatterplot("scatterplot", main_df, 'goals', 'goals')
+    scatter_plot = Scatterplot("scatterplot", main_df_90s_scatter, player_stats_90s[0], player_stats_90s[1])
     
     # drop downs for scatter plot 
-    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats, startingValueNormal='birth_year', startingValueGk = 'gk_save_pct', label='X-Axis Values')
-    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats, startingValueNormal='tackles', startingValueGk = 'gk_passes_length_avg', label='Y-Axis Values')
+    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats_90s, startingValueNormal=player_stats_90s[0], startingValueGk = 'gk_save_pct', label='X-Axis Values')
+    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats_90s, startingValueNormal=player_stats_90s[2], startingValueGk = 'gk_passes_length_avg', label='Y-Axis Values')
     # group dropdowns together horizontally
     scatter_dropdowns = html.Div([x_axis_dropdown, y_axis_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 

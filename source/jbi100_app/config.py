@@ -90,7 +90,7 @@ assists = df_player_stats['assists']
 yellow_cards = df_player_stats['cards_yellow']
 red_cards = df_player_stats['cards_red']
 minutes_90s= df_player_stats['minutes_90s']
-
+minutes_90s[minutes_90s<1] = 1
 
 ############
 
@@ -102,7 +102,6 @@ df_player_basic = pd.concat([birth_year, team, position, minutes_90s],axis=1)
 main_df = pd.concat([goals, xg, birth_year, assists, appearances, yellow_cards, red_cards, passes, touches, shots,
                      offsides, tackles, fouls, dispossessed, own_goals, clearances, position, team, shot_creating_actions, goal_creating_actions,
                     blocks, miscontrols], axis=1)
-print(main_df.head())
 
 #Drop goalkeepers
 main_df = main_df.drop(main_df[main_df['position'] == 'GK'].index)
@@ -113,15 +112,16 @@ main_df.fillna('No data')
 
 ##### MAIN DF 90S ######
 main_df_90s = pd.DataFrame(index=main_df.index)
+main_df_90s_scatter = pd.DataFrame(index=main_df.index)
 
 for column in main_df.columns:
     if column not in ['xg', 'birth_year', 'position', 'team']:
-        main_df_90s[column + ' per 90s'] = main_df[column]/minutes_90s
+        main_df_90s[column + ' per 90s'] = round(main_df[column]/minutes_90s,1)
 
+main_df_90s_scatter = pd.concat([main_df_90s,xg,position,team], axis=1)
 
 ##### TABLE DF #####
 table_df = pd.concat([main_df, main_df_90s], axis=1)
-
 
 # teams for table drop down
 teams_list = list(main_df['team'].unique())
@@ -133,6 +133,11 @@ player_stats.remove('team')
 player_stats.remove('position')
 player_stats = sorted(player_stats)
 
+# statistics for table drop down
+player_stats_90s = list(main_df_90s_scatter.columns)
+player_stats_90s.remove('team')
+player_stats_90s.remove('position')
+player_stats_90s = sorted(player_stats_90s)
 
 ##### RADAR DF #####
 

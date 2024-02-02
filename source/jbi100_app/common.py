@@ -17,8 +17,13 @@ def filter_df(df, team_filter, position_filter):
     return df
 
 def rank_df(df, selected_stat):
-    df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
-    df = df[['rank', 'player', 'team', selected_stat, 'position']]
+    #df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)
+    selected_stat_90s = f"{selected_stat} per 90s"
+    try:
+        df = df[['player', selected_stat, selected_stat_90s, 'team', 'position']]
+    except:
+        print("not 90s")
+        df = df[['player', selected_stat, 'team', 'position']]
     df = df.sort_values(by=selected_stat, ascending=False)
     return df
 

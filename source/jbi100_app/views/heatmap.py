@@ -47,7 +47,7 @@ class Heatmap(html.Div):
             y=normalized_df.index,
             hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
             hoverongaps = False,
-            colorscale='Viridis'))
+            colorscale='Mint'))
         
         return self.update_heatmap_layout(fig, player, show_y_ticks)
     
@@ -71,7 +71,7 @@ class Heatmap(html.Div):
             y=first_five_values_df.index,
             customdata=customdata_input,
             hovertemplate='Player: %{y}<br>%{x}: %{customdata:.2f}',
-            colorscale='Viridis'))
+            colorscale='Mint'))
         
         return self.update_heatmap_layout(fig, None, True)
     
