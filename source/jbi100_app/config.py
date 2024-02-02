@@ -164,45 +164,45 @@ def get_attack_score(row):
     else: goals = row['goals']/row['minutes_90s']
 
 
-    score = 1 + (pens 
-             + goals
-             + 2*row['goals_per_shot']/df_player_shooting['goals_per_shot'].max() 
-             + row['shots_on_target_pct']/100
-             + row['average_shot_distance']/df_player_shooting['average_shot_distance'].max() )
+    score = (pens 
+             + 2*goals
+             + 2*row['goals_per_shot']/goals_per_shot.max() 
+             + 2*row['shots_on_target_pct']/100
+             + row['average_shot_distance']/average_shot_distance.max() )
 
-    return min(score, 5)
+    return score
 
 def get_defense_score(row):
     if (row['tackles'] == 0): tackles = 0
     else: tackles = row['tackles_won'] / row['tackles']
 
-    score = 1 +(5/3*tackles 
-             + 5/3*row['blocks']/df_player_defense['blocks'].max()
-             + 5/3*row['clearances']/df_player_defense['blocks'].max() 
-             - 2*row['errors'])
+    score = (tackles 
+             + row['blocks']/blocks.max()
+             + row['clearances']/blocks.max() 
+             - 0.5*row['errors'])
 
-    return min(max(score, 0),5)
+    return max(score, 0)
 
 def get_control_score(row):
     if row['passes_received'] == 0: pen = 0
-    else: pen = (row['miscontrols']+row['dispossessed'])/( row['passes_received'])
+    else: pen = (row['miscontrols']+row['dispossessed'])/(row['passes_received'])
 
-    score = 1+ (2*row['aerials_won_pct']/100
-             + row['touches']/df_player_possession['touches'].max()
+    score = (2*row['aerials_won_pct']/100
+             + row['touches']/touches.max()
              + 2*row['dribbles_completed_pct']/100
              - pen)
 
-    return min(max(score, 0), 5)
+    return max(score, 0)
 
 def get_passing_score(row):
 
-    score = 1 + (row['passes_pct']/100
-             + 0.5*row['passes_total_distance']/df_player_passing['passes_total_distance'].max()
-             + 0.25*row['passes_pct_long']/100
-             + 2.5*row['assists']/df_player_passing['assists'].max()
-             + 0.75*row['progressive_passes']/df_player_passing['progressive_passes'].max())
+    score = (row['passes_pct']/100
+             + 0.5*row['passes_total_distance']/passes_total_distance.max()
+             + 0.5*row['passes_pct_long']/100
+             + 2*row['assists']/assists.max()
+             + 0.75*row['progressive_passes']/progressive_passes.max())
 
-    return min(score,5)
+    return score
 
 def get_discipline_score(row):
 
@@ -222,6 +222,8 @@ radar_df['Control'] = aux_radar_df.apply(get_control_score, axis=1)
 radar_df['Passing'] = aux_radar_df.apply(get_passing_score, axis=1)
 radar_df['Discipline'] = aux_radar_df.apply(get_discipline_score, axis=1)
 
+radar_df = radar_df.apply(normalize_df)
+radar_df = radar_df.apply(lambda x: x*5)
 
 ###### Gk Dfs######
 
@@ -283,24 +285,24 @@ def get_stopping_score(row):
 def get_defense_score(row):
     
     score = (2*row['gk_crosses_stopped_pct']/100
-             + 2*row['gk_def_actions_outside_pen_area_per90']/df_player_keepersadv['gk_def_actions_outside_pen_area_per90'].max()
-             + row['gk_avg_distance_def_actions']/df_player_keepersadv['gk_avg_distance_def_actions'].max())
+             + 2*row['gk_def_actions_outside_pen_area_per90']/gk_def_actions_outside_pen_area_per90.max()
+             + row['gk_avg_distance_def_actions']/gk_avg_distance_def_actions.max())
 
     return score
 
 def get_penalty_score(row):
-    return 5*row['gk_pens_save_pct']/100
+    return row['gk_pens_save_pct']/100
 
 def get_passing_score(row):
 
-    score = (row['gk_passes_length_avg']/df_player_keepersadv['gk_passes_length_avg'].max()
+    score = (row['gk_passes_length_avg']/gk_passes_length_avg.max()
              + 4*row['gk_passes_pct_launched']/100)
 
     return score
 
 def get_kick_score(row):
 
-    score = (2*row['gk_goal_kick_length_avg']/df_player_keepersadv['gk_goal_kick_length_avg'].max()
+    score = (2*row['gk_goal_kick_length_avg']/gk_goal_kick_length_avg.max()
             + 3*row['gk_pct_goal_kicks_launched']/100)
 
     return score
@@ -310,6 +312,9 @@ radar_gk_df['Defense'] = main_gk_df.apply(get_defense_score, axis=1)
 radar_gk_df['Kick'] = main_gk_df.apply(get_kick_score, axis=1)
 radar_gk_df['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
 radar_gk_df['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
+
+radar_gk_df = radar_gk_df.apply(normalize_df)
+radar_gk_df = radar_gk_df.apply(lambda x: x*5)
 
 
 ###### SIMILAR PLAYERS ######
