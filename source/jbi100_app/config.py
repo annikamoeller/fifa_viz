@@ -253,12 +253,22 @@ main_gk_df = pd.concat([position, team, minutes_90s, appearances,
                         gk_crosses_stopped_pct, gk_def_actions_outside_pen_area_per90, gk_avg_distance_def_actions,
                         gk_pens_save_pct,
                         gk_passes_pct_launched, gk_passes_length_avg,
-                        gk_goal_kick_length_avg, gk_pct_goal_kicks_launched
+                        gk_goal_kick_length_avg, gk_pct_goal_kicks_launched,
+                        birth_year
                      ], axis=1)
 main_gk_df = main_gk_df.drop(main_gk_df[main_gk_df['position'] != 'GK'].index)
 
 
 main_gk_df.replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+
+main_gk_df_90s = pd.DataFrame(index = main_gk_df.index)
+main_gk_df_90s_scatter = pd.DataFrame(index = main_gk_df.index)
+
+for column in main_gk_df.columns:
+    if column not in ['birth_year', 'position', 'team']:
+        main_gk_df[column + ' per 90s'] = round(main_gk_df[column]/minutes_90s,1)
+
+main_gk_df_90s_scatter = pd.concat([main_gk_df_90s,xg,position,team], axis=1)
 
 # statistics for table drop down
 gk_stats = list(main_gk_df.columns)
@@ -302,7 +312,7 @@ radar_gk_df['Passing'] = main_gk_df.apply(get_passing_score, axis=1)
 radar_gk_df['Penalty'] = main_gk_df.apply(get_penalty_score, axis=1)
 
 
-#################################################FUCKING GK END #####################################################
+###### SIMILAR PLAYERS ######
 
 def get_similar_players(on, player, num_similar_players=5):
     """
