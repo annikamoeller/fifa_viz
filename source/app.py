@@ -185,7 +185,8 @@ if __name__ == '__main__':
     def update_scatter(gk_toggled, on, click, x_label, y_label, selected_stat, team_filter, position_filter, clicked_table_player_data, current_page, page_size, clicked_cell):
         """
         Return a figure with a teams plot based on team dropdown value 
-        """
+        """      
+        
         gk_toggled = json.loads(gk_toggled)
         scatter_plot.set_gk_toggled(gk_toggled)
         player = None
