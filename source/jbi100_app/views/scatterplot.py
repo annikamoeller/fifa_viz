@@ -19,12 +19,18 @@ class Scatterplot(html.Div):
         self.highlighted_player = None
         self.team_filter = None
         self.position_filter = None
-        self.x_axis_stat = x_axis_stat
-        self.y_axis_stat = y_axis_stat
         self.df = df
+
+        if x_axis_stat not in ['birth_year', 'xg']:
+            self.x_axis_stat = f"{x_axis_stat}/game"
+        else: self.x_axis_stat = x_axis_stat
         
+        if y_axis_stat not in ['birth_year', 'xg']:
+            self.y_axis_stat = f"{y_axis_stat}/game"
+        else: self.y_axis_stat = y_axis_stat
+
         df = main_df_90s_scatter.reset_index()
-        self.initial_plot = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
+        self.initial_plot = px.scatter(df, x=self.x_axis_stat, y=self.y_axis_stat, hover_data='player', color='position')
         
         # Equivalent to `html.Div([...])`
         super().__init__(
@@ -46,14 +52,19 @@ class Scatterplot(html.Div):
         if on: df = main_gk_df_90s_scatter.reset_index()
         else: df = main_df_90s_scatter.reset_index()
 
-        self.x_axis_stat = x_axis_stat
-        self.y_axis_stat = y_axis_stat
+        if x_axis_stat not in ['birth_year', 'xg']:
+            self.x_axis_stat = f"{x_axis_stat}/game"
+        else: self.x_axis_stat = x_axis_stat
+        if y_axis_stat not in ['birth_year', 'xg']:
+            self.y_axis_stat = f"{y_axis_stat}/game"
+        else: self.y_axis_stat = y_axis_stat
+
         self.selected_stat = selected_stat
         self.team_filter = team_filter
         self.position_filter = position_filter
                
         df = filter_df(df, team_filter, position_filter)
-        fig = px.scatter(df, x=x_axis_stat, y=y_axis_stat, hover_data='player', color='position')
+        fig = px.scatter(df, x=self.x_axis_stat, y=self.y_axis_stat, hover_data='player', color='position')
         fig.update_traces(marker=dict(
             size=10
         ))

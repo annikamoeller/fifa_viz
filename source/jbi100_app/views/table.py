@@ -20,13 +20,10 @@ class Table(html.Div):
         if df is not None:
             df = df.reset_index()
             self.selected_stat = selected_stat
-            print(selected_stat)
             self.selected_stat_90s = f"{selected_stat}/game"
-            print(self.selected_stat_90s)
             try:
                 df = df[['player', self.selected_stat, self.selected_stat_90s, 'team', 'position']]
             except:
-                print("not 90s")
                 df = df[['player', self.selected_stat, 'team', 'position']]
 
             #df['rank'] = df[selected_stat].rank(method = 'dense', ascending=False)

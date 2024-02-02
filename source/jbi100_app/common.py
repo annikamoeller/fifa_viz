@@ -22,7 +22,6 @@ def rank_df(df, selected_stat):
     try:
         df = df[['player', selected_stat, selected_stat_90s, 'team', 'position']]
     except:
-        print("not 90s")
         df = df[['player', selected_stat, 'team', 'position']]
     df = df.sort_values(by=selected_stat, ascending=False)
     return df

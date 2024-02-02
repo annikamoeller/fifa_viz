@@ -28,7 +28,6 @@ if __name__ == '__main__':
     #similar_player_table = Table("similar_player_table", None, 'birth_year')
     # drop downs 
     table_stat_dropdown = Dropdown("stat_dd", player_stats, startingValueNormal=player_stats[0], startingValueGk='gk_save_pct', label='Select statistic')
-    print(player_stats)
     filter_position_dropdown = Dropdown("position_dd", ['FW', 'MF', 'DF'], label='Filter by position', multiple_values=True)
     filter_team_dropdown = Dropdown("team_dd", teams_list, label= 'Filter by team', multiple_values=True)
     # group dropdowns together horizontally
@@ -43,11 +42,11 @@ if __name__ == '__main__':
                                                'padding-left': '3rem', 'padding-top': '1rem'} )
 
     # Scatter plot
-    scatter_plot = Scatterplot("scatterplot", main_df_90s_scatter, player_stats_90s[0], player_stats_90s[1])
+    scatter_plot = Scatterplot("scatterplot", main_df_90s_scatter, player_stats[0], player_stats[1])
     
     # drop downs for scatter plot 
-    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats_90s, startingValueNormal=player_stats_90s[0], startingValueGk = 'gk_save_pct', label='X-Axis Values')
-    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats_90s, startingValueNormal=player_stats_90s[2], startingValueGk = 'gk_passes_length_avg', label='Y-Axis Values')
+    x_axis_dropdown = Dropdown("x_axis_dropdown", player_stats, startingValueNormal=player_stats[0], startingValueGk = 'gk_save_pct', label='X-Axis Values')
+    y_axis_dropdown = Dropdown("y_axis_dropdown", player_stats, startingValueNormal=player_stats[2], startingValueGk = 'gk_passes_length_avg', label='Y-Axis Values')
     # group dropdowns together horizontally
     scatter_dropdowns = html.Div([x_axis_dropdown, y_axis_dropdown], style={'display': 'flex', 'flexDirection': 'row'})
 
@@ -186,7 +185,6 @@ if __name__ == '__main__':
         """
         Return a figure with a teams plot based on team dropdown value 
         """      
-        
         gk_toggled = json.loads(gk_toggled)
         scatter_plot.set_gk_toggled(gk_toggled)
         player = None
@@ -219,6 +217,7 @@ if __name__ == '__main__':
 
         style = blue_highlight_style.copy()
         if clicked_cell: 
+            print("blue highlight")
             style.append(
                 {
                     "if": {"row_index": clicked_cell["row"]},
@@ -231,6 +230,7 @@ if __name__ == '__main__':
         if clicked_table_player_data and clicked_cell:
             try:
                 table_player = clicked_table_player_data[clicked_cell['row']+(current_page)*page_size]['player']
+                print("table player ", table_player)
             except: 
                 table_player = None
         else: table_player = None
@@ -257,16 +257,23 @@ if __name__ == '__main__':
                     )
             #if we change labels or filters we persist the table click value,
             #otherwise, we set the clicked players in scatter_plot
+            if x_label not in ['birth_year', 'xg']:
+                x_label = f"{x_label}/game"
+            if y_label not in ['birth_year', 'xg']:
+                y_label = f"{y_label}/game"
+
             if x_label != scatter_plot.x_axis_stat \
                                 or y_label != scatter_plot.y_axis_stat  \
                                 or team_filter != scatter_plot.team_filter \
                                 or position_filter != scatter_plot.position_filter:
+                print(x_label, scatter_plot.x_axis_stat)
                 if not table_player:
                     scatter_plot.set_click_player(None, None)
                 else:
                     player = table_player
                     scatter_plot.set_click_player(table_player, None)
                     style = lightgrey_highlight_style.copy()
+                    print("light grey highlight \n")
                     style.append(
                         {
                             "if": {"row_index": clicked_cell["row"]},
@@ -281,6 +288,10 @@ if __name__ == '__main__':
             player = scatter_player
         if gk_toggled:
             player = None
+
+        x_label = x_label.split('/')[0]
+        y_label = y_label.split('/')[0]
+
         return scatter_plot.update(on, x_label, y_label, selected_stat, team_filter, position_filter, player), json.dumps(player), style, json.dumps(False)
     
     # update the table based on the drop downs

@@ -118,7 +118,7 @@ for column in main_df.columns:
     if column not in ['xg', 'birth_year', 'position', 'team']:
         main_df_90s[column + '/game'] = round(main_df[column]/minutes_90s,1)
 
-main_df_90s_scatter = pd.concat([main_df_90s,xg,position,team], axis=1)
+main_df_90s_scatter = pd.concat([main_df_90s, birth_year, xg, position, team], axis=1)
 
 ##### TABLE DF #####
 table_df = pd.concat([main_df, main_df_90s], axis=1)
@@ -268,14 +268,21 @@ main_gk_df_90s_scatter = pd.DataFrame(index = main_gk_df.index)
 
 for column in main_gk_df.columns:
     if column not in ['birth_year', 'position', 'team']:
-        main_gk_df[column + ' per 90s'] = round(main_gk_df[column]/minutes_90s,1)
+        main_gk_df_90s[column + '/game'] = round(main_gk_df[column]/minutes_90s,1)
 
-main_gk_df_90s_scatter = pd.concat([main_gk_df_90s,xg,position,team], axis=1)
+main_gk_df_90s_scatter = pd.concat([main_gk_df_90s, birth_year, xg, position, team], axis=1)
 
 # statistics for table drop down
 gk_stats = list(main_gk_df.columns)
 gk_stats.remove('team')
 gk_stats.remove('position')
+gk_stats = sorted(gk_stats)
+
+# statistics for table drop down
+gk_stats_90s = list(main_gk_df_90s_scatter.columns)
+gk_stats_90s.remove('team')
+gk_stats_90s.remove('position')
+gk_stats_90s = sorted(player_stats_90s)
 
 radar_gk_df = pd.DataFrame()
 
